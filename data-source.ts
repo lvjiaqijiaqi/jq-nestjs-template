@@ -8,12 +8,16 @@ config();
 const configService = new ConfigService();
 
 export const AppDataSource = new DataSource({
-  type: 'postgres',
+  type: 'mysql',
   host: configService.get('DB_HOST', 'localhost'),
-  port: configService.get('DB_PORT', 5432),
+  port: configService.get('DB_PORT', 3306),
   username: configService.get('DB_USERNAME'),
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
+  
+  // MySQL特定配置
+  charset: 'utf8mb4',
+  timezone: '+00:00',
   
   // 实体路径
   entities: [

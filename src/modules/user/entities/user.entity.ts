@@ -83,7 +83,8 @@ export class User extends BaseEntity {
 
   @ApiProperty({ description: '用户角色ID', required: false })
   @Column({
-    type: 'uuid',
+    type: 'varchar',
+    length: 36,
     comment: '用户角色ID',
     nullable: true,
   })

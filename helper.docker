@@ -1,0 +1,12 @@
+docker run -d \
+  --name jq_project_template_mysl \
+  -e MYSQL_DATABASE=main \
+  -e MYSQL_ROOT_PASSWORD=root \
+  -p 3306:3306 \
+  mysql
+
+
+  docker run -d \
+  --name jq_project_template_redis \
+  -p 6379:6379 \
+  redis

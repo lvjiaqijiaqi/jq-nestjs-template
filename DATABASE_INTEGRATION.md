@@ -6,7 +6,7 @@
 
 #### ORM 集成 ✅
 - [x] 选择 TypeORM 作为 ORM 框架
-- [x] 配置 PostgreSQL 数据库连接
+- [x] 配置 MySQL 数据库连接
 - [x] 实体/模型定义规范
 - [x] 数据库迁移策略配置
 - [x] 种子数据管理框架
@@ -100,9 +100,9 @@ npm run schema:drop          # 删除数据库架构
 
 ```env
 # 数据库配置
-DB_TYPE=postgres
+DB_TYPE=mysql
 DB_HOST=localhost
-DB_PORT=5432
+DB_PORT=3306
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
 DB_NAME=your_database_name
@@ -174,11 +174,13 @@ npm run migration:revert
 - 支持 `synchronize: true` 自动同步数据库结构
 - 启用详细日志记录
 - 支持热重载
+- 使用 utf8mb4 字符集支持完整 Unicode
 
 ### 生产环境
 - 使用迁移管理数据库结构变更
 - 关闭自动同步功能
 - 配置连接池和SSL
+- 优化 MySQL 性能参数
 
 ### 缓存配置
 - 集成 Redis 查询缓存
@@ -196,7 +198,7 @@ npm run migration:revert
 
 ## ⚠️ 注意事项
 
-1. **数据库连接**: 确保PostgreSQL服务正在运行并且连接配置正确
+1. **数据库连接**: 确保MySQL服务正在运行并且连接配置正确
 2. **迁移管理**: 生产环境务必使用迁移而不是自动同步
 3. **环境变量**: 生产环境中的数据库密码等敏感信息要妥善管理
 4. **版本控制**: 迁移文件需要纳入版本控制

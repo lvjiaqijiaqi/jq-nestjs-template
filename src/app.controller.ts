@@ -39,7 +39,7 @@ export class AppController {
         version: this.configService.get<string>('app.version'),
         database: {
           status: 'connected',
-          type: 'postgres',
+          type: 'mysql',
         },
         memory: {
           used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),

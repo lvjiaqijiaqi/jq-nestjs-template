@@ -37,7 +37,8 @@ export abstract class BaseEntity extends TypeOrmBaseEntity {
 
   @ApiProperty({ description: '创建者ID', required: false })
   @Column({
-    type: 'uuid',
+    type: 'varchar',
+    length: 36,
     comment: '创建者ID',
     nullable: true,
   })
@@ -45,7 +46,8 @@ export abstract class BaseEntity extends TypeOrmBaseEntity {
 
   @ApiProperty({ description: '更新者ID', required: false })
   @Column({
-    type: 'uuid',
+    type: 'varchar',
+    length: 36,
     comment: '更新者ID',
     nullable: true,
   })

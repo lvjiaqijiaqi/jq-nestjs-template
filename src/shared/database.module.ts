@@ -9,12 +9,16 @@ import { DataSource } from 'typeorm';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        type: 'postgres',
+        type: configService.get<string>('database.type') as any,
         host: configService.get<string>('database.host'),
         port: configService.get<number>('database.port'),
         username: configService.get<string>('database.username'),
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.database'),
+        
+        // MySQL 特定配置
+        charset: configService.get<string>('database.charset'),
+        timezone: configService.get<string>('database.timezone'),
         
         // 实体配置
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],

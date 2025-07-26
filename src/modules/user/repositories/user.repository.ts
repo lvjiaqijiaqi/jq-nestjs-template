@@ -172,7 +172,7 @@ export class UserRepository extends BaseRepository<User> {
    */
   async searchUsers(keyword: string, limit = 20): Promise<User[]> {
     return await this.userRepository.createQueryBuilder('user')
-      .where('user.username ILIKE :keyword OR user.email ILIKE :keyword OR user.nickname ILIKE :keyword', {
+      .where('user.username LIKE :keyword OR user.email LIKE :keyword OR user.nickname LIKE :keyword', {
         keyword: `%${keyword}%`
       })
       .andWhere('user.status = :status', { status: UserStatus.ACTIVE })

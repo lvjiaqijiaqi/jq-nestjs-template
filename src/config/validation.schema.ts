@@ -16,9 +16,9 @@ export const validationSchema = Joi.object({
   CORS_CREDENTIALS: Joi.boolean().default(true),
 
   // 数据库配置 (开发环境可选，生产环境必须)
-  DB_TYPE: Joi.string().valid('postgres', 'mysql', 'sqlite', 'mongodb').default('postgres'),
+  DB_TYPE: Joi.string().valid('postgres', 'mysql', 'sqlite', 'mongodb').default('mysql'),
   DB_HOST: Joi.string().default('localhost'),
-  DB_PORT: Joi.number().default(5432),
+  DB_PORT: Joi.number().default(3306),
   DB_USERNAME: Joi.string().when('NODE_ENV', {
     is: 'production',
     then: Joi.required(),
