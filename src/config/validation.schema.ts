@@ -11,10 +11,6 @@ export const validationSchema = Joi.object({
   API_PREFIX: Joi.string().default('api'),
   API_VERSION: Joi.string().default('v1'),
 
-  // 安全配置
-  CORS_ENABLED: Joi.boolean().default(true),
-  CORS_CREDENTIALS: Joi.boolean().default(true),
-
   // 数据库配置 (开发环境可选，生产环境必须)
   DB_TYPE: Joi.string().valid('postgres', 'mysql', 'sqlite', 'mongodb').default('mysql'),
   DB_HOST: Joi.string().default('localhost'),
@@ -22,62 +18,89 @@ export const validationSchema = Joi.object({
   DB_USERNAME: Joi.string().when('NODE_ENV', {
     is: 'production',
     then: Joi.required(),
-    otherwise: Joi.optional()
+    otherwise: Joi.optional(),
   }),
   DB_PASSWORD: Joi.string().when('NODE_ENV', {
-    is: 'production', 
+    is: 'production',
     then: Joi.required(),
-    otherwise: Joi.optional()
+    otherwise: Joi.optional(),
   }),
   DB_NAME: Joi.string().when('NODE_ENV', {
     is: 'production',
-    then: Joi.required(), 
-    otherwise: Joi.optional()
+    then: Joi.required(),
+    otherwise: Joi.optional(),
   }),
   DB_SYNCHRONIZE: Joi.boolean().default(false),
   DB_LOGGING: Joi.boolean().default(false),
   DB_SSL: Joi.boolean().default(false),
+  DB_SSL_REJECT_UNAUTHORIZED: Joi.boolean().default(true),
+  DB_MAX_CONNECTIONS: Joi.number().default(10),
+  DB_MIN_CONNECTIONS: Joi.number().default(1),
+  DB_ACQUIRE_TIMEOUT: Joi.number().default(60000),
+  DB_IDLE_TIMEOUT: Joi.number().default(600000),
 
   // JWT 配置
   JWT_SECRET: Joi.string().min(32).default('your-super-secret-jwt-key-change-this-in-production-at-least-32-characters-long'),
-  JWT_EXPIRES_IN: Joi.string().default('7d'),
   JWT_REFRESH_SECRET: Joi.string().min(32).default('your-super-secret-refresh-key-change-this-in-production-at-least-32-characters-long'),
-  JWT_REFRESH_EXPIRES_IN: Joi.string().default('30d'),
+  JWT_EXPIRES_IN: Joi.string().default('15m'),
+  JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
+  JWT_ISSUER: Joi.string().allow('').optional(),
+  JWT_AUDIENCE: Joi.string().allow('').optional(),
 
-  // Redis 配置
+  // Redis 配置 (可选)
   REDIS_HOST: Joi.string().default('localhost'),
   REDIS_PORT: Joi.number().default(6379),
   REDIS_PASSWORD: Joi.string().allow('').optional(),
   REDIS_DB: Joi.number().default(0),
 
-  // 限流配置
-  THROTTLE_TTL: Joi.number().default(60),
-  THROTTLE_LIMIT: Joi.number().default(100),
+  // CORS 配置
+  CORS_ENABLED: Joi.boolean().default(true),
+  CORS_CREDENTIALS: Joi.boolean().default(true),
 
-  // 文件上传配置
-  UPLOAD_MAX_SIZE: Joi.number().default(10485760), // 10MB
-  UPLOAD_ALLOWED_TYPES: Joi.string().default('jpg,jpeg,png,gif,pdf,doc,docx'),
+  // 邮件配置 (可选)
+  MAIL_HOST: Joi.string().allow('').optional(),
+  MAIL_PORT: Joi.number().allow('').optional(),
+  MAIL_USER: Joi.string().allow('').optional(),
+  MAIL_PASSWORD: Joi.string().allow('').optional(),
+  MAIL_FROM: Joi.string().allow('').optional(),
 
-  // 邮件配置
-  MAIL_HOST: Joi.string().optional(),
-  MAIL_PORT: Joi.number().default(587),
-  MAIL_USER: Joi.string().optional(),
-  MAIL_PASS: Joi.string().optional(),
-  MAIL_FROM: Joi.string().optional(),
+  // 日志配置
+  LOG_LEVEL: Joi.string().valid('error', 'warn', 'info', 'debug', 'verbose').default('info'),
 
-  // 云存储配置 (完全可选)
+  // 安全配置
+  RATE_LIMIT_TTL: Joi.number().default(60),
+  RATE_LIMIT_LIMIT: Joi.number().default(100),
+  BODY_PARSER_LIMIT: Joi.string().default('10mb'),
+  BODY_PARSER_PARAMETER_LIMIT: Joi.number().default(1000),
+  
+  // 密码策略
+  PASSWORD_MIN_LENGTH: Joi.number().default(8),
+  PASSWORD_REQUIRE_UPPERCASE: Joi.boolean().default(true),
+  PASSWORD_REQUIRE_LOWERCASE: Joi.boolean().default(true),
+  PASSWORD_REQUIRE_NUMBERS: Joi.boolean().default(true),
+  PASSWORD_REQUIRE_SYMBOLS: Joi.boolean().default(false),
+  
+  // IP过滤
+  IP_WHITELIST: Joi.string().allow('').optional(),
+  IP_BLACKLIST: Joi.string().allow('').optional(),
+  
+  // 会话安全
+  MAX_CONCURRENT_SESSIONS: Joi.number().default(5),
+  SESSION_TIMEOUT: Joi.number().default(3600),
+
+  // 云存储配置 (可选)
   AWS_ACCESS_KEY_ID: Joi.string().allow('').optional(),
   AWS_SECRET_ACCESS_KEY: Joi.string().allow('').optional(),
-  AWS_S3_BUCKET: Joi.string().allow('').optional(),
-  AWS_S3_REGION: Joi.string().allow('').optional(),
+  AWS_S3_BUCKET_NAME: Joi.string().allow('').optional(),
 
-  // 第三方服务 (完全可选)
+  // 第三方服务配置 (可选)
   GOOGLE_CLIENT_ID: Joi.string().allow('').optional(),
   GOOGLE_CLIENT_SECRET: Joi.string().allow('').optional(),
   GITHUB_CLIENT_ID: Joi.string().allow('').optional(),
   GITHUB_CLIENT_SECRET: Joi.string().allow('').optional(),
+  WECHAT_APP_ID: Joi.string().allow('').optional(),
+  WECHAT_APP_SECRET: Joi.string().allow('').optional(),
 
-  // 监控和日志
-  LOG_LEVEL: Joi.string().valid('error', 'warn', 'info', 'debug').default('info'),
+  // 监控配置 (可选)
   SENTRY_DSN: Joi.string().allow('').optional(),
 }); 

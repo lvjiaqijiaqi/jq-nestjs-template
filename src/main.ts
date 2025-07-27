@@ -1,7 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+
+// 正确导入helmet和compression
+const helmet = require('helmet');
+const compression = require('compression');
 
 async function bootstrap() {
   // 创建应用时启用详细日志
@@ -12,21 +17,27 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const logger = new Logger('Bootstrap');
 
-  // 添加 HTTP 请求日志中间件
-  app.use((req, res, next) => {
-    const { method, originalUrl } = req;
-    const userAgent = req.get('User-Agent') || '';
-    
-    logger.log(`🔗 ${method} ${originalUrl} - ${userAgent}`);
-    
-    // 记录响应时间
-    const start = Date.now();
-    res.on('finish', () => {
-      const { statusCode } = res;
-      const duration = Date.now() - start;
-      logger.log(`✅ ${method} ${originalUrl} ${statusCode} - ${duration}ms`);
-    });
-    
+  // 安全中间件 - Helmet
+  const helmetConfig = configService.get('security.helmet');
+  app.use(helmet(helmetConfig));
+
+  // 启用压缩
+  app.use(compression());
+
+  // 请求体大小限制
+  const bodyParserConfig = configService.get('security.bodyParser');
+  app.use('/api', (req, res, next) => {
+    if (req.headers['content-length']) {
+      const contentLength = parseInt(req.headers['content-length']);
+      const maxSize = parseInt(bodyParserConfig.limit.replace('mb', '')) * 1024 * 1024;
+      if (contentLength > maxSize) {
+        return res.status(413).json({
+          code: 413,
+          message: '请求体过大',
+          data: null,
+        });
+      }
+    }
     next();
   });
 
@@ -38,6 +49,12 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       transformOptions: {
         enableImplicitConversion: true,
+      },
+      // 添加验证错误详细信息
+      disableErrorMessages: false,
+      validationError: {
+        target: false,
+        value: false,
       },
     }),
   );
@@ -53,7 +70,40 @@ async function bootstrap() {
     app.enableCors({
       origin: nodeEnv === 'production' ? false : true, // 生产环境需要配置具体域名
       credentials: configService.get<boolean>('app.cors.credentials', true),
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     });
+  }
+
+  // Swagger 文档配置
+  if (nodeEnv !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('NestJS API Documentation')
+      .setDescription('企业级 NestJS 样板项目 API 文档')
+      .setVersion('1.0')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          name: 'JWT',
+          description: 'Enter JWT token',
+          in: 'header',
+        },
+        'JWT-auth', // This name here is important for matching up with @ApiBearerAuth() in your controller!
+      )
+      .addTag('认证', '用户认证相关接口')
+      .addTag('应用', '应用基础接口')
+      .build();
+
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    });
+
+    logger.log(`📚 Swagger documentation: http://localhost:${port}/api/docs`);
   }
 
   // 启动应用
@@ -61,6 +111,7 @@ async function bootstrap() {
 
   logger.log(`🚀 ${appName} is running on: http://localhost:${port}`);
   logger.log(`📄 Environment: ${nodeEnv}`);
+  logger.log(`🛡️ Security features enabled: Helmet, CORS, Rate Limiting, XSS Protection`);
   logger.log(`📊 Logs enabled: HTTP requests, Database queries, Application events`);
 }
 

@@ -5,18 +5,20 @@ import { AppService } from './app.service';
 import { GlobalConfigModule } from './shared/config.module';
 import { DatabaseModule } from './shared/database.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { SecurityModule } from './modules/security/security.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
     GlobalConfigModule,
     DatabaseModule,
+    SecurityModule, // 新增安全模块
     AuthModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    // 全局启用 JWT 认证守卫（可以通过 @Public() 装饰器跳过）
+    // 全局启用JWT认证守卫（可以通过@Public()装饰器跳过）
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
