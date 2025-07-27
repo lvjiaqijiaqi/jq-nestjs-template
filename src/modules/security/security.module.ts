@@ -44,16 +44,11 @@ import { IsStrongPasswordConstraint } from '../../common/validators/password.val
     // 中间件
     SecurityMiddleware,
   ],
-  exports: [
-    SecurityMiddleware,
-    IsStrongPasswordConstraint,
-  ],
+  exports: [SecurityMiddleware, IsStrongPasswordConstraint],
 })
 export class SecurityModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     // 应用安全中间件到所有路由
-    consumer
-      .apply(SecurityMiddleware)
-      .forRoutes('*');
+    consumer.apply(SecurityMiddleware).forRoutes('*');
   }
-} 
+}

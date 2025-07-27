@@ -66,10 +66,10 @@ export class User extends BaseEntity {
   })
   phone?: string;
 
-  @ApiProperty({ 
-    description: '用户状态', 
-    enum: UserStatus, 
-    example: UserStatus.ACTIVE 
+  @ApiProperty({
+    description: '用户状态',
+    enum: UserStatus,
+    example: UserStatus.ACTIVE,
   })
   @Column({
     type: 'enum',
@@ -89,7 +89,7 @@ export class User extends BaseEntity {
   roleId?: string;
 
   // 用户角色关联
-  @ManyToOne(() => Role, role => role.users, {
+  @ManyToOne(() => Role, (role) => role.users, {
     eager: true, // 自动加载角色信息
   })
   @JoinColumn({ name: 'roleId' })
@@ -118,4 +118,4 @@ export class User extends BaseEntity {
     comment: '手机验证状态',
   })
   phoneVerified: boolean;
-} 
+}

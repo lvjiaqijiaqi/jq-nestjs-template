@@ -1,5 +1,15 @@
-import { SetMetadata, createParamDecorator, ExecutionContext, applyDecorators, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiUnauthorizedResponse, ApiForbiddenResponse } from '@nestjs/swagger';
+import {
+  SetMetadata,
+  createParamDecorator,
+  ExecutionContext,
+  applyDecorators,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiUnauthorizedResponse,
+  ApiForbiddenResponse,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { PermissionsGuard } from '../guards/permissions.guard';
 
@@ -12,14 +22,14 @@ export const IS_PUBLIC_KEY = 'isPublic';
  * 设置接口所需权限
  * @param permissions 权限列表
  */
-export const RequirePermissions = (...permissions: string[]) => 
+export const RequirePermissions = (...permissions: string[]) =>
   SetMetadata(PERMISSIONS_KEY, permissions);
 
 /**
  * 设置接口所需角色
  * @param roles 角色列表
  */
-export const RequireRoles = (...roles: string[]) => 
+export const RequireRoles = (...roles: string[]) =>
   SetMetadata(ROLES_KEY, roles);
 
 /**
@@ -91,4 +101,4 @@ export const AdminAuth = () => AuthRoles('admin');
 /**
  * 用户权限装饰器（普通用户或更高权限）
  */
-export const UserAuth = () => AuthRoles('user', 'admin', 'moderator'); 
+export const UserAuth = () => AuthRoles('user', 'admin', 'moderator');

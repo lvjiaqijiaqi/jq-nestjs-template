@@ -10,7 +10,7 @@ import { CacheService } from './services/cache.service';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         const cacheConfig = configService.get('cache');
-        
+
         // 如果没有启用缓存，使用内存缓存
         if (!cacheConfig.performance.enabled || !process.env.REDIS_HOST) {
           return {
@@ -63,4 +63,4 @@ import { CacheService } from './services/cache.service';
   providers: [CacheService],
   exports: [CacheService, NestCacheModule],
 })
-export class CacheModule {} 
+export class CacheModule {}

@@ -7,9 +7,10 @@ import { v4 as uuidv4 } from 'uuid';
  */
 export function generateRequestId(request: Request): string {
   // 检查请求头中是否已有请求ID
-  const existingId = request.headers['x-request-id'] || 
-                    request.headers['x-correlation-id'] || 
-                    request.headers['request-id'];
+  const existingId =
+    request.headers['x-request-id'] ||
+    request.headers['x-correlation-id'] ||
+    request.headers['request-id'];
 
   if (existingId && typeof existingId === 'string') {
     return existingId;
@@ -17,10 +18,10 @@ export function generateRequestId(request: Request): string {
 
   // 生成新的请求ID
   const requestId = `req_${uuidv4().replace(/-/g, '')}`;
-  
+
   // 将请求ID存储到请求对象中，供后续使用
   (request as any).requestId = requestId;
-  
+
   return requestId;
 }
 
@@ -28,10 +29,12 @@ export function generateRequestId(request: Request): string {
  * 从请求对象中获取请求ID
  */
 export function getRequestId(request: Request): string | undefined {
-  return (request as any).requestId || 
-         request.headers['x-request-id'] as string || 
-         request.headers['x-correlation-id'] as string || 
-         request.headers['request-id'] as string;
+  return (
+    (request as any).requestId ||
+    (request.headers['x-request-id'] as string) ||
+    (request.headers['x-correlation-id'] as string) ||
+    (request.headers['request-id'] as string)
+  );
 }
 
 /**
@@ -46,4 +49,4 @@ export function generateShortId(): string {
  */
 export function generatePrefixedId(prefix: string): string {
   return `${prefix}_${uuidv4().replace(/-/g, '')}`;
-} 
+}

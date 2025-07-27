@@ -1,6 +1,14 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsOptional, IsPositive, IsInt, Min, Max, IsString, IsIn } from 'class-validator';
+import {
+  IsOptional,
+  IsPositive,
+  IsInt,
+  Min,
+  Max,
+  IsString,
+  IsIn,
+} from 'class-validator';
 
 /**
  * 分页查询DTO
@@ -85,8 +93,8 @@ export class UserListDto extends PaginationDto {
   })
   @IsOptional()
   @IsString()
-  @IsIn(['active', 'inactive', 'suspended'], { 
-    message: '用户状态只能是active、inactive或suspended' 
+  @IsIn(['active', 'inactive', 'suspended'], {
+    message: '用户状态只能是active、inactive或suspended',
   })
   status?: 'active' | 'inactive' | 'suspended';
 
@@ -193,4 +201,4 @@ export class PaginatedResponseDto<T> {
     this.data = data;
     this.meta = new PaginationMeta(page, limit, total);
   }
-} 
+}

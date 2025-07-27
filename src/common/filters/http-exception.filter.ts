@@ -39,7 +39,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
       if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
         const responseObj = exceptionResponse as any;
-        
+
         // 处理验证错误
         if (responseObj.message && Array.isArray(responseObj.message)) {
           errorResponse = ResponseDto.error(
@@ -67,7 +67,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const errorCode = getErrorByHttpStatus(status);
         errorResponse = ResponseDto.customError(
           status,
-          exceptionResponse as string || errorCode.message,
+          exceptionResponse || errorCode.message,
           path,
           requestId,
         );
@@ -76,15 +76,20 @@ export class HttpExceptionFilter implements ExceptionFilter {
       // 处理未知异常
       status = HttpStatus.INTERNAL_SERVER_ERROR;
       const errorCode = ERROR_CODES.SYSTEM_INTERNAL_ERROR;
-      
+
       errorResponse = ResponseDto.error(
         errorCode,
         path,
         requestId,
-        process.env.NODE_ENV === 'development' ? {
-          error: exception instanceof Error ? exception.message : 'Unknown error',
-          stack: exception instanceof Error ? exception.stack : undefined,
-        } : undefined,
+        process.env.NODE_ENV === 'development'
+          ? {
+              error:
+                exception instanceof Error
+                  ? exception.message
+                  : 'Unknown error',
+              stack: exception instanceof Error ? exception.stack : undefined,
+            }
+          : undefined,
       );
 
       // 记录未知异常的详细信息
@@ -97,7 +102,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     // 记录错误日志
     const logMessage = `${method} ${path} ${status} - ${errorResponse.message} - RequestId: ${requestId} - UserAgent: ${userAgent}`;
-    
+
     if (status >= 500) {
       this.logger.error(logMessage);
     } else if (status >= 400) {
@@ -107,7 +112,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     // 设置响应头
     response.status(status);
     response.setHeader('X-Request-Id', requestId || '');
-    
+
     // 发送错误响应
     response.json(errorResponse);
   }
@@ -119,7 +124,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
  */
 export class BusinessException extends HttpException {
   constructor(
-    errorCode: typeof ERROR_CODES[keyof typeof ERROR_CODES],
+    errorCode: (typeof ERROR_CODES)[keyof typeof ERROR_CODES],
     data?: any,
   ) {
     super(
@@ -138,7 +143,7 @@ export class BusinessException extends HttpException {
  */
 export class AuthException extends HttpException {
   constructor(
-    errorCode: typeof ERROR_CODES[keyof typeof ERROR_CODES],
+    errorCode: (typeof ERROR_CODES)[keyof typeof ERROR_CODES],
     data?: any,
   ) {
     super(
@@ -157,7 +162,7 @@ export class AuthException extends HttpException {
  */
 export class ForbiddenException extends HttpException {
   constructor(
-    errorCode: typeof ERROR_CODES[keyof typeof ERROR_CODES],
+    errorCode: (typeof ERROR_CODES)[keyof typeof ERROR_CODES],
     data?: any,
   ) {
     super(
@@ -176,7 +181,7 @@ export class ForbiddenException extends HttpException {
  */
 export class NotFoundException extends HttpException {
   constructor(
-    errorCode: typeof ERROR_CODES[keyof typeof ERROR_CODES],
+    errorCode: (typeof ERROR_CODES)[keyof typeof ERROR_CODES],
     data?: any,
   ) {
     super(
@@ -188,4 +193,4 @@ export class NotFoundException extends HttpException {
       HttpStatus.NOT_FOUND,
     );
   }
-} 
+}

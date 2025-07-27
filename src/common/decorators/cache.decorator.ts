@@ -1,5 +1,8 @@
 import { applyDecorators, SetMetadata } from '@nestjs/common';
-import { CacheStrategy, CacheOptions } from '../../modules/cache/services/cache.service';
+import {
+  CacheStrategy,
+  CacheOptions,
+} from '../../modules/cache/services/cache.service';
 
 // 缓存元数据键
 export const CACHE_KEY_METADATA = 'cache_key';
@@ -29,13 +32,15 @@ export function Cacheable(options: CacheDecoratorOptions = {}) {
  * 缓存失效装饰器
  * 在方法执行后清除指定的缓存
  */
-export function CacheEvict(options: {
-  key?: string | string[] | ((args: any[]) => string | string[]);
-  strategy?: CacheStrategy;
-  allEntries?: boolean;
-  beforeInvocation?: boolean;
-  condition?: (args: any[], result?: any) => boolean;
-} = {}) {
+export function CacheEvict(
+  options: {
+    key?: string | string[] | ((args: any[]) => string | string[]);
+    strategy?: CacheStrategy;
+    allEntries?: boolean;
+    beforeInvocation?: boolean;
+    condition?: (args: any[], result?: any) => boolean;
+  } = {},
+) {
   return SetMetadata('cache_evict', options);
 }
 
@@ -75,15 +80,17 @@ export class CacheKeyGenerator {
     if (typeof keyTemplate === 'function') {
       return keyTemplate(args);
     }
-    
+
     if (typeof keyTemplate === 'string') {
       return this.interpolateKey(keyTemplate, args);
     }
-    
+
     // 默认键生成策略
-    const argsString = args.length > 0 ? 
-      ':' + args.map(arg => this.serializeArg(arg)).join(':') : '';
-    
+    const argsString =
+      args.length > 0
+        ? ':' + args.map((arg) => this.serializeArg(arg)).join(':')
+        : '';
+
     return `${className}:${methodName}${argsString}`;
   }
 
@@ -157,7 +164,7 @@ export class CacheConditions {
    */
   static and(...conditions: ((args: any[], result?: any) => boolean)[]) {
     return (args: any[], result?: any) => {
-      return conditions.every(condition => condition(args, result));
+      return conditions.every((condition) => condition(args, result));
     };
   }
 
@@ -166,7 +173,7 @@ export class CacheConditions {
    */
   static or(...conditions: ((args: any[], result?: any) => boolean)[]) {
     return (args: any[], result?: any) => {
-      return conditions.some(condition => condition(args, result));
+      return conditions.some((condition) => condition(args, result));
     };
   }
 }
@@ -230,4 +237,4 @@ export const CachePresets = {
     ttl: 60,
     strategy: CacheStrategy.QUERY,
   },
-} as const; 
+} as const;

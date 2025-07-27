@@ -9,14 +9,14 @@ import { ResponseDto } from '../dto/response.dto';
  */
 export function ApiSuccessResponse<T>(
   type?: Type<T> | Function | [Function] | string,
-  description: string = 'Success'
+  description: string = 'Success',
 ) {
   return applyDecorators(
     ApiResponse({
       status: 200,
       description,
       type: ResponseDto,
-    })
+    }),
   );
 }
 
@@ -27,14 +27,14 @@ export function ApiSuccessResponse<T>(
  */
 export function ApiCreatedResponse<T>(
   type?: Type<T> | Function | [Function] | string,
-  description: string = 'Created successfully'
+  description: string = 'Created successfully',
 ) {
   return applyDecorators(
     ApiResponse({
       status: 201,
       description,
       type: ResponseDto,
-    })
+    }),
   );
 }
 
@@ -82,7 +82,7 @@ export function ApiDocumentation(
   summary: string,
   tags?: string | string[],
   successType?: Type<any> | Function | [Function] | string,
-  successDescription?: string
+  successDescription?: string,
 ) {
   const decorators = [
     ApiOperation({ summary }),
@@ -99,4 +99,4 @@ export function ApiDocumentation(
   }
 
   return applyDecorators(...decorators);
-} 
+}

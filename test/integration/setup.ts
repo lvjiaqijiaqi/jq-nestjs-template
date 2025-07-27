@@ -32,7 +32,8 @@ beforeEach(async () => {
     await cleanDatabase();
   }
   if (cacheManager) {
-    await (cacheManager as any).reset?.() || await (cacheManager as any).flushAll?.();
+    (await (cacheManager as any).reset?.()) ||
+      (await (cacheManager as any).flushAll?.());
   }
 });
 
@@ -41,7 +42,10 @@ beforeEach(async () => {
  * @param imports 要导入的模块
  * @param providers 要提供的服务
  */
-export async function createTestingModule(imports: any[] = [], providers: any[] = []) {
+export async function createTestingModule(
+  imports: any[] = [],
+  providers: any[] = [],
+) {
   moduleRef = await Test.createTestingModule({
     imports,
     providers,
@@ -71,16 +75,16 @@ async function cleanDatabase() {
 
   try {
     const entities = dataSource.entityMetadatas;
-    
+
     // 禁用外键约束检查
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 0');
-    
+
     // 清空所有表
     for (const entity of entities) {
       const repository = dataSource.getRepository(entity.name);
       await repository.clear();
     }
-    
+
     // 启用外键约束检查
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 1');
   } catch (error) {
@@ -107,4 +111,4 @@ export function getTestDataSource() {
  */
 export function getTestCacheManager() {
   return cacheManager;
-} 
+}

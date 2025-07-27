@@ -9,15 +9,17 @@ import { RoleFactory } from '../factories/role.factory';
  */
 export const mockAuthService = {
   // 用户验证
-  validateUser: jest.fn().mockImplementation(async (username: string, password: string) => {
-    if (username === 'testuser' && password === 'password123') {
-      return UserFactory.buildTestUser({ id: '1' });
-    }
-    if (username === 'admin' && password === 'password123') {
-      return UserFactory.buildAdmin({ id: '2' });
-    }
-    return null;
-  }),
+  validateUser: jest
+    .fn()
+    .mockImplementation(async (username: string, password: string) => {
+      if (username === 'testuser' && password === 'password123') {
+        return UserFactory.buildTestUser({ id: '1' });
+      }
+      if (username === 'admin' && password === 'password123') {
+        return UserFactory.buildAdmin({ id: '2' });
+      }
+      return null;
+    }),
 
   // 登录
   login: jest.fn().mockImplementation(async (user: User) => {
@@ -61,9 +63,11 @@ export const mockAuthService = {
   }),
 
   // 修改密码
-  changePassword: jest.fn().mockImplementation(async (userId: string, changePasswordDto: any) => {
-    return { success: true };
-  }),
+  changePassword: jest
+    .fn()
+    .mockImplementation(async (userId: string, changePasswordDto: any) => {
+      return { success: true };
+    }),
 
   // 登出
   logout: jest.fn().mockImplementation(async (userId: string) => {
@@ -111,12 +115,14 @@ export const mockUserService = {
   }),
 
   // 更新用户
-  update: jest.fn().mockImplementation(async (id: string, updateUserDto: any) => {
-    return UserFactory.buildTestUser({
-      id,
-      ...updateUserDto,
-    });
-  }),
+  update: jest
+    .fn()
+    .mockImplementation(async (id: string, updateUserDto: any) => {
+      return UserFactory.buildTestUser({
+        id,
+        ...updateUserDto,
+      });
+    }),
 
   // 删除用户
   remove: jest.fn().mockImplementation(async (id: string) => {
@@ -164,12 +170,14 @@ export const mockRoleService = {
   }),
 
   // 更新角色
-  update: jest.fn().mockImplementation(async (id: string, updateRoleDto: any) => {
-    return RoleFactory.build({
-      id,
-      ...updateRoleDto,
-    });
-  }),
+  update: jest
+    .fn()
+    .mockImplementation(async (id: string, updateRoleDto: any) => {
+      return RoleFactory.build({
+        id,
+        ...updateRoleDto,
+      });
+    }),
 
   // 删除角色
   remove: jest.fn().mockImplementation(async (id: string) => {
@@ -178,19 +186,16 @@ export const mockRoleService = {
 
   // 获取用户角色权限
   getUserPermissions: jest.fn().mockImplementation(async (userId: string) => {
-    return [
-      'user:read',
-      'user:write',
-      'profile:read',
-      'profile:write',
-    ];
+    return ['user:read', 'user:write', 'profile:read', 'profile:write'];
   }),
 
   // 检查权限
-  hasPermission: jest.fn().mockImplementation(async (userId: string, permission: string) => {
-    const userPermissions = await mockRoleService.getUserPermissions(userId);
-    return userPermissions.includes(permission);
-  }),
+  hasPermission: jest
+    .fn()
+    .mockImplementation(async (userId: string, permission: string) => {
+      const userPermissions = await mockRoleService.getUserPermissions(userId);
+      return userPermissions.includes(permission);
+    }),
 };
 
 /**
@@ -232,9 +237,11 @@ export const mockCacheService = {
     return null;
   }),
 
-  set: jest.fn().mockImplementation(async (key: string, value: any, options?: any) => {
-    return 'OK';
-  }),
+  set: jest
+    .fn()
+    .mockImplementation(async (key: string, value: any, options?: any) => {
+      return 'OK';
+    }),
 
   del: jest.fn().mockImplementation(async (key: string) => {
     return 1;
@@ -259,14 +266,18 @@ export const mockCacheService = {
  * 队列服务 Mock 实现
  */
 export const mockQueueService = {
-  addJob: jest.fn().mockImplementation(async (queueType: string, jobName: string, data: any) => {
-    return {
-      id: 'mock-job-id',
-      name: jobName,
-      data,
-      opts: {},
-    };
-  }),
+  addJob: jest
+    .fn()
+    .mockImplementation(
+      async (queueType: string, jobName: string, data: any) => {
+        return {
+          id: 'mock-job-id',
+          name: jobName,
+          data,
+          opts: {},
+        };
+      },
+    ),
 
   getQueueStats: jest.fn().mockImplementation(async (queueType: string) => {
     return {
@@ -281,9 +292,30 @@ export const mockQueueService = {
 
   getAllQueueStats: jest.fn().mockImplementation(async () => {
     return {
-      email: { waiting: 2, active: 1, completed: 50, failed: 1, delayed: 0, paused: 0 },
-      file: { waiting: 3, active: 1, completed: 30, failed: 2, delayed: 1, paused: 0 },
-      notification: { waiting: 0, active: 0, completed: 20, failed: 0, delayed: 0, paused: 0 },
+      email: {
+        waiting: 2,
+        active: 1,
+        completed: 50,
+        failed: 1,
+        delayed: 0,
+        paused: 0,
+      },
+      file: {
+        waiting: 3,
+        active: 1,
+        completed: 30,
+        failed: 2,
+        delayed: 1,
+        paused: 0,
+      },
+      notification: {
+        waiting: 0,
+        active: 0,
+        completed: 20,
+        failed: 0,
+        delayed: 0,
+        paused: 0,
+      },
     };
   }),
 
@@ -294,4 +326,4 @@ export const mockQueueService = {
   resumeQueue: jest.fn().mockImplementation(async (queueType: string) => {
     return { success: true };
   }),
-}; 
+};

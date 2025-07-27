@@ -45,7 +45,7 @@ export class MetricsMiddleware implements NestMiddleware {
 
     // 记录请求开始时间
     req._startTime = process.hrtime();
-    
+
     // 记录请求大小
     req._requestSize = this.getRequestSize(req);
 
@@ -66,7 +66,9 @@ export class MetricsMiddleware implements NestMiddleware {
   private recordMetrics(req: MonitoredRequest, res: Response) {
     try {
       // 计算请求持续时间
-      const duration = req._startTime ? this.calculateDuration(req._startTime) : 0;
+      const duration = req._startTime
+        ? this.calculateDuration(req._startTime)
+        : 0;
 
       // 获取路由路径
       const route = req._routePath || this.normalizeRoute(req);
@@ -254,14 +256,21 @@ export class ErrorRateMiddleware implements NestMiddleware {
     const errors = this.errorCounter.get(key) || 0;
     const requests = this.requestCounter.get(key) || 0;
 
-    if (requests > 10) { // 只在有足够请求时检查
+    if (requests > 10) {
+      // 只在有足够请求时检查
       const errorRate = errors / requests;
-      const thresholds = this.configService.get('monitoring.thresholds.errorRate');
+      const thresholds = this.configService.get(
+        'monitoring.thresholds.errorRate',
+      );
 
       if (errorRate >= thresholds.critical) {
-        this.logger.error(`Critical error rate detected: ${(errorRate * 100).toFixed(2)}% for ${route}`);
+        this.logger.error(
+          `Critical error rate detected: ${(errorRate * 100).toFixed(2)}% for ${route}`,
+        );
       } else if (errorRate >= thresholds.warning) {
-        this.logger.warn(`High error rate detected: ${(errorRate * 100).toFixed(2)}% for ${route}`);
+        this.logger.warn(
+          `High error rate detected: ${(errorRate * 100).toFixed(2)}% for ${route}`,
+        );
       }
     }
   }
@@ -299,25 +308,36 @@ export class ErrorRateMiddleware implements NestMiddleware {
   /**
    * 获取当前错误率统计
    */
-  getErrorRateStats(): Array<{ route: string; errorRate: number; requests: number; errors: number }> {
-    const stats: Array<{ route: string; errorRate: number; requests: number; errors: number }> = [];
+  getErrorRateStats(): Array<{
+    route: string;
+    errorRate: number;
+    requests: number;
+    errors: number;
+  }> {
+    const stats: Array<{
+      route: string;
+      errorRate: number;
+      requests: number;
+      errors: number;
+    }> = [];
     const currentMinute = Math.floor(Date.now() / this.windowSize);
 
     // 聚合最近5分钟的数据
-    const routeStats: Map<string, { requests: number; errors: number }> = new Map();
+    const routeStats: Map<string, { requests: number; errors: number }> =
+      new Map();
 
     for (let i = 0; i < 5; i++) {
       const minute = currentMinute - i;
-      
+
       for (const [key, requests] of this.requestCounter.entries()) {
         const [route, keyMinute] = key.split(':');
         if (parseInt(keyMinute, 10) === minute) {
           const current = routeStats.get(route) || { requests: 0, errors: 0 };
           current.requests += requests;
-          
+
           const errorKey = `${route}:${minute}`;
           current.errors += this.errorCounter.get(errorKey) || 0;
-          
+
           routeStats.set(route, current);
         }
       }
@@ -336,4 +356,4 @@ export class ErrorRateMiddleware implements NestMiddleware {
 
     return stats.sort((a, b) => b.errorRate - a.errorRate);
   }
-} 
+}

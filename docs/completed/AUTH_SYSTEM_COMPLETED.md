@@ -5,6 +5,7 @@
 ### ✅ 认证授权系统
 
 #### JWT 认证 ✅
+
 - [x] 安装依赖包 (`@nestjs/jwt`, `@nestjs/passport`, `passport-jwt`, `passport-local`, `bcryptjs`)
 - [x] JWT 策略实现 - 支持Bearer Token认证
 - [x] 访问令牌 + 刷新令牌机制
@@ -12,6 +13,7 @@
 - [x] 令牌配置化管理（密钥、过期时间、发行方等）
 
 #### 角色权限控制 (RBAC) ✅
+
 - [x] RBAC 数据模型设计 - Role、Permission、User 实体关联
 - [x] 权限 Guards 实现 - PermissionsGuard
 - [x] 权限装饰器 (@RequirePermissions, @RequireRoles)
@@ -20,6 +22,7 @@
 - [x] 灵活的权限缓存机制
 
 #### 多种认证方式 ✅
+
 - [x] 本地认证（用户名/密码）- Local Strategy
 - [x] 支持邮箱或用户名登录
 - [x] 密码加密存储 (bcryptjs)
@@ -55,23 +58,27 @@ src/modules/auth/
 ## 🛡️ 安全特性
 
 ### 1. 密码安全
+
 - **加密存储**: 使用 bcryptjs 进行密码哈希（12轮加盐）
 - **密码验证**: 安全的密码比较机制
 - **密码修改**: 需要验证原密码的安全修改流程
 
 ### 2. JWT 安全
+
 - **双Token机制**: 访问令牌 + 刷新令牌分离
 - **令牌验证**: 完整的载荷验证（用户存在性、状态检查）
 - **配置化密钥**: 支持不同环境的密钥配置
 - **过期控制**: 可配置的令牌过期时间
 
 ### 3. 权限控制
+
 - **角色分级**: 支持角色等级控制
 - **权限粒度**: 精细到资源+动作的权限控制
 - **动态验证**: 实时的权限状态检查
 - **权限继承**: 角色权限的灵活分配
 
 ### 4. 用户状态管理
+
 - **状态控制**: active/inactive/suspended 状态管理
 - **账户验证**: 邮箱/手机验证状态跟踪
 - **登录追踪**: 最后登录时间记录
@@ -81,6 +88,7 @@ src/modules/auth/
 ### 认证相关接口
 
 #### 1. 用户注册
+
 ```http
 POST /auth/register
 Content-Type: application/json
@@ -96,6 +104,7 @@ Content-Type: application/json
 ```
 
 #### 2. 用户登录
+
 ```http
 POST /auth/login
 Content-Type: application/json
@@ -107,6 +116,7 @@ Content-Type: application/json
 ```
 
 #### 3. 刷新令牌
+
 ```http
 POST /auth/refresh
 Content-Type: application/json
@@ -117,12 +127,14 @@ Content-Type: application/json
 ```
 
 #### 4. 获取用户资料
+
 ```http
 GET /auth/profile
 Authorization: Bearer {accessToken}
 ```
 
 #### 5. 修改密码
+
 ```http
 PATCH /auth/change-password
 Authorization: Bearer {accessToken}
@@ -136,6 +148,7 @@ Content-Type: application/json
 ```
 
 #### 6. 获取当前用户信息
+
 ```http
 GET /auth/me
 Authorization: Bearer {accessToken}
@@ -144,6 +157,7 @@ Authorization: Bearer {accessToken}
 ## 🎯 权限装饰器使用
 
 ### 1. 基础认证
+
 ```typescript
 @Auth()  // 需要登录
 @Get('protected')
@@ -153,6 +167,7 @@ async getProtectedData() {
 ```
 
 ### 2. 权限控制
+
 ```typescript
 @Auth('user:read', 'user:update')  // 需要特定权限
 @Get('users')
@@ -162,6 +177,7 @@ async getUsers() {
 ```
 
 ### 3. 角色控制
+
 ```typescript
 @AuthRoles('admin', 'moderator')  // 需要特定角色
 @Delete('users/:id')
@@ -171,6 +187,7 @@ async deleteUser(@Param('id') id: string) {
 ```
 
 ### 4. 管理员权限
+
 ```typescript
 @AdminAuth()  // 需要管理员权限
 @Post('system/config')
@@ -180,6 +197,7 @@ async updateSystemConfig(@Body() config: any) {
 ```
 
 ### 5. 公开接口
+
 ```typescript
 @Public()  // 无需认证
 @Get('public-data')
@@ -189,6 +207,7 @@ async getPublicData() {
 ```
 
 ### 6. 获取当前用户
+
 ```typescript
 @Auth()
 @Get('my-data')
@@ -203,21 +222,23 @@ async getMyData(
 ## 🗃️ 数据模型
 
 ### 权限 (Permission)
+
 ```typescript
 {
   id: string;
-  name: string;           // 如: "user:create"
-  displayName: string;    // 如: "创建用户"
+  name: string; // 如: "user:create"
+  displayName: string; // 如: "创建用户"
   description: string;
-  action: PermissionAction;    // create/read/update/delete/manage
+  action: PermissionAction; // create/read/update/delete/manage
   resource: PermissionResource; // user/role/permission/system等
-  group: string;          // 权限分组
+  group: string; // 权限分组
   isActive: boolean;
   // 基础字段: createdAt, updatedAt, etc.
 }
 ```
 
 ### 角色 (Role)
+
 ```typescript
 {
   id: string;
@@ -234,18 +255,19 @@ async getMyData(
 ```
 
 ### 用户 (User) - 已更新
+
 ```typescript
 {
   id: string;
   username: string;
   email: string;
-  password: string;       // 加密存储
+  password: string; // 加密存储
   nickname: string;
   avatar: string;
   phone: string;
-  status: UserStatus;     // active/inactive/suspended
-  roleId: string;         // 关联角色ID
-  role: Role;            // 角色信息
+  status: UserStatus; // active/inactive/suspended
+  roleId: string; // 关联角色ID
+  role: Role; // 角色信息
   emailVerified: boolean;
   phoneVerified: boolean;
   lastLoginAt: Date;
@@ -258,6 +280,7 @@ async getMyData(
 系统预置了完整的角色权限数据：
 
 ### 默认角色
+
 1. **超级管理员 (admin)**
    - 等级: 100
    - 权限: 所有系统权限
@@ -275,6 +298,7 @@ async getMyData(
    - 类型: 自定义角色
 
 ### 默认用户
+
 1. **管理员用户**
    - 用户名: `admin`
    - 密码: `admin123456`
@@ -288,6 +312,7 @@ async getMyData(
    - 角色: 普通用户
 
 ### 运行种子数据
+
 ```bash
 npm run seed:auth
 ```
@@ -295,6 +320,7 @@ npm run seed:auth
 ## 🔧 配置说明
 
 ### 环境变量 (.env)
+
 ```env
 # JWT 配置
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-at-least-32-characters-long
@@ -306,6 +332,7 @@ JWT_AUDIENCE=jq-project-template-users
 ```
 
 ### JWT 配置选项
+
 - **密钥管理**: 访问令牌和刷新令牌使用不同密钥
 - **过期时间**: 支持秒(s)、分钟(m)、小时(h)、天(d)格式
 - **发行方**: 令牌发行方标识
@@ -316,18 +343,20 @@ JWT_AUDIENCE=jq-project-template-users
 ### 1. 基础使用流程
 
 1. **用户注册**
+
 ```bash
 curl -X POST http://localhost:3000/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "username": "newuser",
-    "email": "newuser@example.com", 
+    "email": "newuser@example.com",
     "password": "password123",
     "confirmPassword": "password123"
   }'
 ```
 
 2. **用户登录**
+
 ```bash
 curl -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
@@ -338,6 +367,7 @@ curl -X POST http://localhost:3000/auth/login \
 ```
 
 3. **访问受保护的资源**
+
 ```bash
 curl -X GET http://localhost:3000/auth/profile \
   -H "Authorization: Bearer {accessToken}"
@@ -461,4 +491,4 @@ export class UserController {
 现在项目具备了企业级的认证授权能力，可以支持复杂的用户权限管理需求！
 
 **完成时间**: 2025-01-26
-**实施团队**: 项目开发团队 
+**实施团队**: 项目开发团队

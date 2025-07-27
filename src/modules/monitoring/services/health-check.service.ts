@@ -133,7 +133,9 @@ export class HealthCheckService {
       };
 
       const duration = Date.now() - startTime;
-      this.logger.log(`Health check completed in ${duration}ms - Status: ${overallStatus}`);
+      this.logger.log(
+        `Health check completed in ${duration}ms - Status: ${overallStatus}`,
+      );
 
       return result;
     } catch (error) {
@@ -144,7 +146,9 @@ export class HealthCheckService {
         uptime: Date.now() - this.startTime,
         version: 'unknown',
         environment: 'unknown',
-        checks: { error: { status: HealthStatus.UNHEALTHY, message: error.message } },
+        checks: {
+          error: { status: HealthStatus.UNHEALTHY, message: error.message },
+        },
         summary: { total: 1, healthy: 0, degraded: 0, unhealthy: 1 },
       };
     }
@@ -153,7 +157,10 @@ export class HealthCheckService {
   /**
    * 获取简化的健康状态
    */
-  async getQuickHealthCheck(): Promise<{ status: HealthStatus; message: string }> {
+  async getQuickHealthCheck(): Promise<{
+    status: HealthStatus;
+    message: string;
+  }> {
     try {
       const result = await this.performHealthCheck();
       return {
@@ -176,13 +183,14 @@ export class HealthCheckService {
     try {
       // 检查数据库连接
       await this.dataSource.query('SELECT 1');
-      
+
       // 检查连接池状态
       const poolStats = this.getConnectionPoolStats();
-      
+
       const duration = Date.now() - startTime;
-      const status = duration > 1000 ? HealthStatus.DEGRADED : HealthStatus.HEALTHY;
-      
+      const status =
+        duration > 1000 ? HealthStatus.DEGRADED : HealthStatus.HEALTHY;
+
       return {
         status,
         message: `Database responsive in ${duration}ms`,
@@ -212,16 +220,19 @@ export class HealthCheckService {
       // 尝试缓存操作
       const testKey = 'health_check_test';
       const testValue = Date.now().toString();
-      
+
       await this.cacheService.set(testKey, testValue, { ttl: 10 });
       const retrievedValue = await this.cacheService.get(testKey);
       await this.cacheService.del(testKey);
-      
+
       const duration = Date.now() - startTime;
       const isValid = retrievedValue === testValue;
-      const status = !isValid ? HealthStatus.UNHEALTHY : 
-                   duration > 500 ? HealthStatus.DEGRADED : HealthStatus.HEALTHY;
-      
+      const status = !isValid
+        ? HealthStatus.UNHEALTHY
+        : duration > 500
+          ? HealthStatus.DEGRADED
+          : HealthStatus.HEALTHY;
+
       return {
         status,
         message: `Redis responsive in ${duration}ms`,
@@ -249,23 +260,30 @@ export class HealthCheckService {
       const queueStats = await this.queueService.getAllQueueStats();
       let status = HealthStatus.HEALTHY;
       const issues: string[] = [];
-      
+
       // 检查队列积压情况
       const thresholds = this.configService.get('monitoring.thresholds');
-      Object.entries(queueStats).forEach(([queueName, stats]: [string, any]) => {
-        if (stats.waiting > thresholds.queueBacklog.critical) {
-          status = HealthStatus.UNHEALTHY;
-          issues.push(`${queueName} queue critical backlog: ${stats.waiting}`);
-        } else if (stats.waiting > thresholds.queueBacklog.warning) {
-          if (status === HealthStatus.HEALTHY) status = HealthStatus.DEGRADED;
-          issues.push(`${queueName} queue warning backlog: ${stats.waiting}`);
-        }
-      });
-      
+      Object.entries(queueStats).forEach(
+        ([queueName, stats]: [string, any]) => {
+          if (stats.waiting > thresholds.queueBacklog.critical) {
+            status = HealthStatus.UNHEALTHY;
+            issues.push(
+              `${queueName} queue critical backlog: ${stats.waiting}`,
+            );
+          } else if (stats.waiting > thresholds.queueBacklog.warning) {
+            if (status === HealthStatus.HEALTHY) status = HealthStatus.DEGRADED;
+            issues.push(`${queueName} queue warning backlog: ${stats.waiting}`);
+          }
+        },
+      );
+
       const duration = Date.now() - startTime;
       return {
         status,
-        message: issues.length > 0 ? issues.join('; ') : `All queues healthy in ${duration}ms`,
+        message:
+          issues.length > 0
+            ? issues.join('; ')
+            : `All queues healthy in ${duration}ms`,
         duration,
         data: queueStats,
       };
@@ -288,11 +306,11 @@ export class HealthCheckService {
       const totalMem = os.totalmem();
       const freeMem = os.freemem();
       const usedMemPercent = (totalMem - freeMem) / totalMem;
-      
+
       const thresholds = this.configService.get('monitoring.thresholds.memory');
       let status = HealthStatus.HEALTHY;
       let message = `Memory usage: ${(usedMemPercent * 100).toFixed(1)}%`;
-      
+
       if (usedMemPercent > thresholds.critical) {
         status = HealthStatus.UNHEALTHY;
         message += ' (Critical)';
@@ -300,7 +318,7 @@ export class HealthCheckService {
         status = HealthStatus.DEGRADED;
         message += ' (Warning)';
       }
-      
+
       const duration = Date.now() - startTime;
       return {
         status,
@@ -337,11 +355,11 @@ export class HealthCheckService {
     try {
       const stats = fs.statSync('.');
       const diskInfo = await this.getDiskUsage();
-      
+
       const thresholds = this.configService.get('monitoring.thresholds.disk');
       let status = HealthStatus.HEALTHY;
       let message = `Disk usage: ${diskInfo.usedPercent.toFixed(1)}%`;
-      
+
       if (diskInfo.usedPercent > thresholds.critical * 100) {
         status = HealthStatus.UNHEALTHY;
         message += ' (Critical)';
@@ -349,7 +367,7 @@ export class HealthCheckService {
         status = HealthStatus.DEGRADED;
         message += ' (Warning)';
       }
-      
+
       const duration = Date.now() - startTime;
       return {
         status,
@@ -373,7 +391,7 @@ export class HealthCheckService {
     const startTime = Date.now();
     // 这里可以添加对外部API、服务的健康检查
     const dependencies: DependencyHealth[] = [];
-    
+
     // 示例：检查外部API
     // try {
     //   const response = await axios.get('https://api.example.com/health', { timeout: 5000 });
@@ -391,11 +409,13 @@ export class HealthCheckService {
     //     details: { error: error.message }
     //   });
     // }
-    
-    const overallStatus = dependencies.every(dep => dep.status === HealthStatus.HEALTHY) 
-      ? HealthStatus.HEALTHY 
+
+    const overallStatus = dependencies.every(
+      (dep) => dep.status === HealthStatus.HEALTHY,
+    )
+      ? HealthStatus.HEALTHY
       : HealthStatus.DEGRADED;
-    
+
     const duration = Date.now() - startTime;
     return {
       status: overallStatus,
@@ -429,7 +449,7 @@ export class HealthCheckService {
     return {
       total: 20, // 总连接数
       active: 2, // 活跃连接数
-      idle: 18,  // 空闲连接数
+      idle: 18, // 空闲连接数
       waiting: 0, // 等待连接数
     };
   }
@@ -445,12 +465,12 @@ export class HealthCheckService {
           resolve({ usedPercent: 0, total: 0, free: 0, used: 0 });
           return;
         }
-        
+
         // 模拟磁盘使用情况（实际应用中可以使用statvfs或其他方法）
         resolve({
           total: 1000000, // 1TB
-          used: 500000,   // 500GB
-          free: 500000,   // 500GB
+          used: 500000, // 500GB
+          free: 500000, // 500GB
           usedPercent: 50,
         });
       });
@@ -462,7 +482,7 @@ export class HealthCheckService {
    */
   private calculateSummary(checks: any) {
     const summary = { total: 0, healthy: 0, degraded: 0, unhealthy: 0 };
-    
+
     Object.values(checks).forEach((check: any) => {
       summary.total++;
       switch (check.status) {
@@ -477,7 +497,7 @@ export class HealthCheckService {
           break;
       }
     });
-    
+
     return summary;
   }
 
@@ -507,4 +527,4 @@ export class HealthCheckService {
       return { ready: false, details: { error: error.message } };
     }
   }
-} 
+}

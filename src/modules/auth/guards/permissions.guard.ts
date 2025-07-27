@@ -1,4 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PERMISSIONS_KEY, ROLES_KEY } from '../decorators/auth.decorators';
 
@@ -8,15 +13,15 @@ export class PermissionsGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     // 获取所需的权限和角色
-    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
+      PERMISSIONS_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     // 如果没有设置权限要求，则允许访问
     if (!requiredPermissions && !requiredRoles) {
@@ -41,9 +46,9 @@ export class PermissionsGuard implements CanActivate {
     // 检查具体权限
     if (requiredPermissions && requiredPermissions.length > 0) {
       const userPermissions = user.role?.permissions || [];
-      
-      const hasPermission = requiredPermissions.every(permission => 
-        userPermissions.includes(permission)
+
+      const hasPermission = requiredPermissions.every((permission) =>
+        userPermissions.includes(permission),
       );
 
       if (!hasPermission) {
@@ -53,4 +58,4 @@ export class PermissionsGuard implements CanActivate {
 
     return true;
   }
-} 
+}

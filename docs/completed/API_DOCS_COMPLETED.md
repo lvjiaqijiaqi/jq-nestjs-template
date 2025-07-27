@@ -9,6 +9,7 @@
 ### 1. **Swagger 文档系统** ✅
 
 #### 🔹 完整的Swagger配置
+
 - ✅ 详细的API文档配置（标题、描述、版本、联系方式）
 - ✅ 多环境服务器配置（开发、测试、生产）
 - ✅ JWT认证配置和API Key支持
@@ -17,6 +18,7 @@
 - ✅ 外部文档链接
 
 #### 🔹 API文档自动生成
+
 - ✅ 控制器和方法自动文档化
 - ✅ DTO 自动生成文档模型
 - ✅ 请求/响应示例配置
@@ -24,6 +26,7 @@
 - ✅ 错误响应文档化
 
 #### 🔹 Swagger UI 优化
+
 - ✅ 自定义样式和主题
 - ✅ 持久化认证信息
 - ✅ 操作ID和扩展信息显示
@@ -33,6 +36,7 @@
 ### 2. **统一响应格式系统** ✅
 
 #### 🔹 标准化响应结构
+
 ```typescript
 {
   code: number;           // 业务状态码
@@ -45,6 +49,7 @@
 ```
 
 #### 🔹 响应拦截器
+
 - ✅ 自动包装控制器返回值
 - ✅ 智能识别已包装的响应
 - ✅ 请求ID自动生成和传递
@@ -52,6 +57,7 @@
 - ✅ 跳过转换装饰器支持
 
 #### 🔹 分页响应格式
+
 - ✅ 标准分页元数据结构
 - ✅ 分页计算逻辑（总页数、是否有上下页）
 - ✅ 列表响应格式（不分页）
@@ -60,12 +66,14 @@
 ### 3. **错误码管理系统** ✅
 
 #### 🔹 统一错误码设计
+
 - ✅ 模块化错误码结构（AABBCC格式）
 - ✅ 10个主要模块分类（通用、认证、用户、权限等）
 - ✅ 详细的错误信息映射
 - ✅ HTTP状态码自动匹配
 
 #### 🔹 全局异常过滤器
+
 - ✅ 统一异常处理机制
 - ✅ HTTP异常自动转换
 - ✅ 验证错误特殊处理
@@ -73,6 +81,7 @@
 - ✅ 请求日志和错误追踪
 
 #### 🔹 自定义异常类
+
 - ✅ BusinessException（业务异常）
 - ✅ AuthException（认证异常）
 - ✅ ForbiddenException（权限异常）
@@ -81,18 +90,21 @@
 ### 4. **API 版本控制系统** ✅
 
 #### 🔹 版本控制装饰器
+
 - ✅ @ApiVersion 版本标记装饰器
 - ✅ @DeprecatedApiVersion 废弃版本装饰器
 - ✅ 控制器和方法级版本支持
 - ✅ 多版本并存支持
 
 #### 🔹 版本拦截器
+
 - ✅ 多种版本提取方式（URL路径、查询参数、请求头、Accept头）
 - ✅ 版本验证和错误处理
 - ✅ 废弃版本警告机制
 - ✅ 响应头版本信息
 
 #### 🔹 向后兼容性
+
 - ✅ 版本废弃通知机制
 - ✅ 废弃时间和移除日期配置
 - ✅ 自动版本号选择
@@ -100,18 +112,21 @@
 ### 5. **分页查询系统** ✅
 
 #### 🔹 通用分页DTO
+
 - ✅ 标准分页参数（page、limit、sortBy、sortOrder）
 - ✅ 搜索关键词支持
 - ✅ 数据验证和默认值
 - ✅ 计算属性（skip、take）
 
 #### 🔹 扩展分页DTO
+
 - ✅ UserListDto（用户列表查询）
 - ✅ DateRangeDto（日期范围查询）
 - ✅ PaginationWithDateDto（带日期的分页）
 - ✅ 灵活的查询条件组合
 
 #### 🔹 分页响应格式
+
 - ✅ 完整的分页元数据
 - ✅ 分页计算逻辑
 - ✅ 导航信息（上一页、下一页）
@@ -147,6 +162,7 @@ src/
 ### 🔧 **核心组件**
 
 #### **ResponseTransformInterceptor**
+
 ```typescript
 // 功能：自动包装API响应为统一格式
 @Injectable()
@@ -158,6 +174,7 @@ export class ResponseTransformInterceptor implements NestInterceptor {
 ```
 
 #### **HttpExceptionFilter**
+
 ```typescript
 // 功能：全局异常处理和错误码转换
 @Injectable()
@@ -169,6 +186,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 ```
 
 #### **ApiVersionInterceptor**
+
 ```typescript
 // 功能：API版本控制和废弃警告
 @Injectable()
@@ -235,8 +253,8 @@ filter: true,                 // 启用过滤器
   "code": 200,
   "message": "查询成功",
   "data": [
-    {"id": "1", "name": "用户1"},
-    {"id": "2", "name": "用户2"}
+    { "id": "1", "name": "用户1" },
+    { "id": "2", "name": "用户2" }
   ],
   "meta": {
     "page": 1,
@@ -309,14 +327,14 @@ CC - 具体错误 (01-99)
 
 ### **错误码示例**
 
-| 错误码 | 模块 | 描述 |
-|--------|------|------|
-| 100001 | 通用 | 未知错误 |
-| 100002 | 通用 | 参数错误 |
+| 错误码 | 模块 | 描述         |
+| ------ | ---- | ------------ |
+| 100001 | 通用 | 未知错误     |
+| 100002 | 通用 | 参数错误     |
 | 200001 | 认证 | 缺少认证令牌 |
 | 200002 | 认证 | 认证令牌无效 |
-| 300001 | 用户 | 用户不存在 |
-| 400001 | 权限 | 权限不足 |
+| 300001 | 用户 | 用户不存在   |
+| 400001 | 权限 | 权限不足     |
 
 ## 🔧 使用指南
 
@@ -328,14 +346,14 @@ CC - 具体错误 (01-99)
 @Controller('users')
 export class UsersController {
   @Get()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: '获取用户列表',
-    description: '支持分页和搜索的用户列表查询'
+    description: '支持分页和搜索的用户列表查询',
   })
   @ApiResponse({
     status: 200,
     description: '查询成功',
-    type: PaginatedResponseDto
+    type: PaginatedResponseDto,
   })
   async getUsers(@Query() query: UserListDto) {
     // 自动包装为统一响应格式
@@ -354,11 +372,7 @@ throw new BusinessException(ERROR_CODES.USER_NOT_FOUND);
 throw new AuthException(ERROR_CODES.AUTH_TOKEN_INVALID);
 
 // 自定义错误响应
-return ResponseDto.error(
-  ERROR_CODES.PERMISSION_DENIED,
-  request.url,
-  requestId
-);
+return ResponseDto.error(ERROR_CODES.PERMISSION_DENIED, request.url, requestId);
 ```
 
 ### **3. 分页查询使用**
@@ -371,7 +385,7 @@ async getUsers(@Query() query: UserListDto) {
     query.take,
     query.search
   );
-  
+
   return PaginatedResponseDto.create(
     data,
     query.page,
@@ -455,7 +469,7 @@ API设计与文档系统现已完全实施，提供了：
 ✅ **错误码管理** - 模块化错误码、全局异常处理、详细错误信息  
 ✅ **API版本控制** - 多版本支持、废弃管理、向后兼容  
 ✅ **分页查询支持** - 标准分页、搜索、排序、元数据  
-✅ **企业级设计** - 请求追踪、性能优化、扩展性、测试支持  
+✅ **企业级设计** - 请求追踪、性能优化、扩展性、测试支持
 
 项目现在具备了完整的企业级API设计能力，为前端开发和第三方集成提供了标准化、文档化的接口服务！
 
@@ -463,4 +477,4 @@ API设计与文档系统现已完全实施，提供了：
 
 **实施完成时间**: 2025-07-27  
 **API等级**: 🚀 企业级  
-**文档状态**: ✅ 完整 
+**文档状态**: ✅ 完整

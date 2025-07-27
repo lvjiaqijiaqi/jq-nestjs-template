@@ -10,12 +10,12 @@ import { TestHelpers } from '../utils/test-helpers';
 
 /**
  * E2E 测试模板
- * 
+ *
  * 使用方法：
  * 1. 复制此模板到 test/e2e 目录
  * 2. 替换 YourEntity、YourController 等占位符
  * 3. 根据实际API接口编写测试用例
- * 
+ *
  * 测试覆盖点：
  * - API端点的完整流程
  * - 认证和授权
@@ -37,8 +37,9 @@ describe('YourController (e2e)', () => {
 
     // 创建测试用户和管理员
     const { accessToken } = await testHelpers.createAuthenticatedUser();
-    const { accessToken: adminAccessToken } = await testHelpers.createAdminUser();
-    
+    const { accessToken: adminAccessToken } =
+      await testHelpers.createAdminUser();
+
     authToken = accessToken;
     adminToken = adminAccessToken;
   });
@@ -64,7 +65,7 @@ describe('YourController (e2e)', () => {
       testHelpers.validateApiResponse(response, 201);
       // expect(response.body.data).toHaveProperty('id');
       // expect(response.body.data.name).toBe(createData.name);
-      
+
       // Verify in database
       // const savedEntity = await testDataSource
       //   .getRepository(YourEntity)
@@ -105,14 +106,12 @@ describe('YourController (e2e)', () => {
       // const { accessToken: limitedToken } = await testHelpers.createAuthenticatedUser({
       //   // User with limited permissions
       // });
-
       // Act
       // const response = await request(testApp.getHttpServer())
       //   .post('/api/your-endpoint')
       //   .set('Authorization', `Bearer ${limitedToken}`)
       //   .send(YourEntityFactory.buildCreateData())
       //   .expect(403);
-
       // Assert
       // testHelpers.validateErrorResponse(response, 403);
     });
@@ -142,12 +141,12 @@ describe('YourController (e2e)', () => {
     it('should support filtering', async () => {
       // Arrange
       // Create test data with different properties
-      
+
       // Act
       const response = await request(testApp.getHttpServer())
         .get('/api/your-endpoint')
         .set('Authorization', `Bearer ${authToken}`)
-        .query({ 
+        .query({
           // Add filter parameters
           status: 'active',
         })
@@ -161,12 +160,12 @@ describe('YourController (e2e)', () => {
     it('should support sorting', async () => {
       // Arrange
       // Create test data with different timestamps
-      
+
       // Act
       const response = await request(testApp.getHttpServer())
         .get('/api/your-endpoint')
         .set('Authorization', `Bearer ${authToken}`)
-        .query({ 
+        .query({
           sortBy: 'createdAt',
           sortOrder: 'desc',
         })
@@ -237,7 +236,7 @@ describe('YourController (e2e)', () => {
       // Assert
       testHelpers.validateApiResponse(response);
       // expect(response.body.data.id).toBe(entity.id);
-      
+
       // Verify in database
       // const updatedEntity = await testDataSource
       //   .getRepository(YourEntity)
@@ -273,7 +272,7 @@ describe('YourController (e2e)', () => {
 
       // Assert
       testHelpers.validateApiResponse(response);
-      
+
       // Verify deletion in database
       // const deletedEntity = await testDataSource
       //   .getRepository(YourEntity)
@@ -343,14 +342,14 @@ describe('YourController (e2e)', () => {
     it('should respond within acceptable time limits', async () => {
       // 测试响应时间
       const startTime = Date.now();
-      
+
       await request(testApp.getHttpServer())
         .get('/api/your-endpoint')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
-      
+
       const duration = Date.now() - startTime;
       expect(duration).toBeLessThan(1000); // 1 second
     });
   });
-}); 
+});

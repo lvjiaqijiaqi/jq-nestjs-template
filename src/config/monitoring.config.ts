@@ -33,11 +33,16 @@ export default registerAs('monitoring', () => ({
       instance: process.env.INSTANCE_ID || require('os').hostname(),
     },
     collectDefaultMetrics: process.env.COLLECT_DEFAULT_METRICS !== 'false',
-    collectInterval: parseInt(process.env.METRICS_COLLECT_INTERVAL || '10000', 10), // 10秒
+    collectInterval: parseInt(
+      process.env.METRICS_COLLECT_INTERVAL || '10000',
+      10,
+    ), // 10秒
     httpMetrics: {
       enabled: process.env.HTTP_METRICS_ENABLED !== 'false',
       pathNormalization: process.env.HTTP_PATH_NORMALIZATION === 'true',
-      excludePaths: (process.env.HTTP_METRICS_EXCLUDE_PATHS || '/health,/metrics').split(','),
+      excludePaths: (
+        process.env.HTTP_METRICS_EXCLUDE_PATHS || '/health,/metrics'
+      ).split(','),
       includeStatusCode: process.env.HTTP_INCLUDE_STATUS_CODE !== 'false',
       includeMethod: process.env.HTTP_INCLUDE_METHOD !== 'false',
       includePath: process.env.HTTP_INCLUDE_PATH !== 'false',
@@ -49,8 +54,11 @@ export default registerAs('monitoring', () => ({
     enabled: process.env.APM_ENABLED === 'true',
     serviceName: process.env.APM_SERVICE_NAME || 'jq-project-template',
     serviceVersion: process.env.APM_SERVICE_VERSION || '1.0.0',
-    environment: process.env.APM_ENVIRONMENT || process.env.NODE_ENV || 'development',
-    transactionSampleRate: parseFloat(process.env.APM_TRANSACTION_SAMPLE_RATE || '1.0'),
+    environment:
+      process.env.APM_ENVIRONMENT || process.env.NODE_ENV || 'development',
+    transactionSampleRate: parseFloat(
+      process.env.APM_TRANSACTION_SAMPLE_RATE || '1.0',
+    ),
     captureBody: process.env.APM_CAPTURE_BODY || 'errors',
     captureHeaders: process.env.APM_CAPTURE_HEADERS === 'true',
     logLevel: process.env.APM_LOG_LEVEL || 'info',
@@ -60,10 +68,13 @@ export default registerAs('monitoring', () => ({
   errorMonitoring: {
     enabled: process.env.ERROR_MONITORING_ENABLED === 'true',
     dsn: process.env.SENTRY_DSN || '',
-    environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || 'development',
+    environment:
+      process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || 'development',
     release: process.env.SENTRY_RELEASE || '1.0.0',
     sampleRate: parseFloat(process.env.SENTRY_SAMPLE_RATE || '1.0'),
-    tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE || '0.1'),
+    tracesSampleRate: parseFloat(
+      process.env.SENTRY_TRACES_SAMPLE_RATE || '0.1',
+    ),
     attachStacktrace: process.env.SENTRY_ATTACH_STACKTRACE !== 'false',
     beforeSend: process.env.SENTRY_BEFORE_SEND === 'true',
     integrations: {
@@ -77,7 +88,8 @@ export default registerAs('monitoring', () => ({
   tracing: {
     enabled: process.env.TRACING_ENABLED === 'true',
     serviceName: process.env.TRACING_SERVICE_NAME || 'jq-project-template',
-    endpoint: process.env.TRACING_ENDPOINT || 'http://localhost:14268/api/traces',
+    endpoint:
+      process.env.TRACING_ENDPOINT || 'http://localhost:14268/api/traces',
     sampler: {
       type: process.env.TRACING_SAMPLER_TYPE || 'const',
       param: parseFloat(process.env.TRACING_SAMPLER_PARAM || '1'),
@@ -133,7 +145,9 @@ export default registerAs('monitoring', () => ({
     channels: {
       email: {
         enabled: process.env.ALERT_EMAIL_ENABLED === 'true',
-        recipients: (process.env.ALERT_EMAIL_RECIPIENTS || '').split(',').filter(Boolean),
+        recipients: (process.env.ALERT_EMAIL_RECIPIENTS || '')
+          .split(',')
+          .filter(Boolean),
         smtp: {
           host: process.env.ALERT_SMTP_HOST || '',
           port: parseInt(process.env.ALERT_SMTP_PORT || '587', 10),
@@ -172,8 +186,14 @@ export default registerAs('monitoring', () => ({
   // 数据保留配置
   retention: {
     metrics: {
-      shortTerm: parseInt(process.env.METRICS_SHORT_TERM_RETENTION || '604800', 10), // 7天
-      longTerm: parseInt(process.env.METRICS_LONG_TERM_RETENTION || '2592000', 10), // 30天
+      shortTerm: parseInt(
+        process.env.METRICS_SHORT_TERM_RETENTION || '604800',
+        10,
+      ), // 7天
+      longTerm: parseInt(
+        process.env.METRICS_LONG_TERM_RETENTION || '2592000',
+        10,
+      ), // 30天
     },
     traces: {
       retention: parseInt(process.env.TRACES_RETENTION || '259200', 10), // 3天
@@ -182,4 +202,4 @@ export default registerAs('monitoring', () => ({
       retention: parseInt(process.env.LOGS_RETENTION || '1209600', 10), // 14天
     },
   },
-})); 
+}));

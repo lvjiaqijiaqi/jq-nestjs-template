@@ -10,4 +10,4 @@ import { PerformanceController } from './controllers/performance.controller';
   controllers: [PerformanceController],
   exports: [DatabasePerformanceService, CacheModule],
 })
-export class PerformanceModule {} 
+export class PerformanceModule {}

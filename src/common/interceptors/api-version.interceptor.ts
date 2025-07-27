@@ -10,7 +10,11 @@ import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Reflector } from '@nestjs/core';
 import { Request, Response } from 'express';
-import { API_VERSION_METADATA, getApiVersionInfo, isApiVersionDeprecated } from '../decorators/api-version.decorator';
+import {
+  API_VERSION_METADATA,
+  getApiVersionInfo,
+  isApiVersionDeprecated,
+} from '../decorators/api-version.decorator';
 import { ERROR_CODES } from '../constants/error-codes';
 
 /**
@@ -29,13 +33,14 @@ export class ApiVersionInterceptor implements NestInterceptor {
 
     // 获取请求的API版本
     const requestedVersion = this.extractApiVersion(request);
-    
+
     // 获取控制器和方法的版本信息
     const controllerVersions = this.getControllerVersions(context);
     const methodVersions = this.getMethodVersions(context);
-    
+
     // 方法级别的版本优先于控制器级别
-    const supportedVersions = methodVersions.length > 0 ? methodVersions : controllerVersions;
+    const supportedVersions =
+      methodVersions.length > 0 ? methodVersions : controllerVersions;
 
     // 如果没有指定版本，使用默认版本
     if (supportedVersions.length === 0) {
@@ -43,27 +48,37 @@ export class ApiVersionInterceptor implements NestInterceptor {
     }
 
     // 验证版本
-    if (requestedVersion && !this.isVersionSupported(requestedVersion, supportedVersions)) {
+    if (
+      requestedVersion &&
+      !this.isVersionSupported(requestedVersion, supportedVersions)
+    ) {
       throw new BadRequestException({
         ...ERROR_CODES.INVALID_REQUEST,
         message: `不支持的API版本: ${requestedVersion}`,
-        supportedVersions: supportedVersions.map(v => v.version || v),
+        supportedVersions: supportedVersions.map((v) => v.version || v),
       });
     }
 
     // 检查版本废弃状态
-    const currentVersion = requestedVersion || this.getLatestVersion(supportedVersions);
-    const deprecationInfo = this.getDeprecationInfo(currentVersion, supportedVersions);
+    const currentVersion =
+      requestedVersion || this.getLatestVersion(supportedVersions);
+    const deprecationInfo = this.getDeprecationInfo(
+      currentVersion,
+      supportedVersions,
+    );
 
     if (deprecationInfo) {
       // 添加废弃警告头
       response.setHeader('X-API-Deprecated', 'true');
       response.setHeader('X-API-Deprecated-Version', deprecationInfo.version);
-      
+
       if (deprecationInfo.deprecatedSince) {
-        response.setHeader('X-API-Deprecated-Since', deprecationInfo.deprecatedSince);
+        response.setHeader(
+          'X-API-Deprecated-Since',
+          deprecationInfo.deprecatedSince,
+        );
       }
-      
+
       if (deprecationInfo.removalDate) {
         response.setHeader('X-API-Removal-Date', deprecationInfo.removalDate);
       }
@@ -122,21 +137,29 @@ export class ApiVersionInterceptor implements NestInterceptor {
    * 获取控制器支持的版本
    */
   private getControllerVersions(context: ExecutionContext): any[] {
-    return this.reflector.get<any[]>(API_VERSION_METADATA, context.getClass()) || [];
+    return (
+      this.reflector.get<any[]>(API_VERSION_METADATA, context.getClass()) || []
+    );
   }
 
   /**
    * 获取方法支持的版本
    */
   private getMethodVersions(context: ExecutionContext): any[] {
-    return this.reflector.get<any[]>(API_VERSION_METADATA, context.getHandler()) || [];
+    return (
+      this.reflector.get<any[]>(API_VERSION_METADATA, context.getHandler()) ||
+      []
+    );
   }
 
   /**
    * 检查版本是否被支持
    */
-  private isVersionSupported(version: string, supportedVersions: any[]): boolean {
-    return supportedVersions.some(v => {
+  private isVersionSupported(
+    version: string,
+    supportedVersions: any[],
+  ): boolean {
+    return supportedVersions.some((v) => {
       const versionStr = typeof v === 'string' ? v : v.version;
       return versionStr === version;
     });
@@ -152,22 +175,28 @@ export class ApiVersionInterceptor implements NestInterceptor {
 
     // 简单实现：返回第一个版本
     const firstVersion = supportedVersions[0];
-    return typeof firstVersion === 'string' ? firstVersion : firstVersion.version;
+    return typeof firstVersion === 'string'
+      ? firstVersion
+      : firstVersion.version;
   }
 
   /**
    * 获取废弃信息
    */
   private getDeprecationInfo(version: string, supportedVersions: any[]): any {
-    const versionInfo = supportedVersions.find(v => {
+    const versionInfo = supportedVersions.find((v) => {
       const versionStr = typeof v === 'string' ? v : v.version;
       return versionStr === version;
     });
 
-    if (versionInfo && typeof versionInfo === 'object' && versionInfo.deprecated) {
+    if (
+      versionInfo &&
+      typeof versionInfo === 'object' &&
+      versionInfo.deprecated
+    ) {
       return versionInfo;
     }
 
     return null;
   }
-} 
+}

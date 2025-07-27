@@ -28,7 +28,10 @@ export class UserFactory {
   /**
    * 创建多个用户测试数据
    */
-  static buildList(count: number, overrides: Partial<User> = {}): Partial<User>[] {
+  static buildList(
+    count: number,
+    overrides: Partial<User> = {},
+  ): Partial<User>[] {
     return Array.from({ length: count }, () => this.build(overrides));
   }
 
@@ -144,4 +147,4 @@ export class UserFactory {
       ...overrides,
     };
   }
-} 
+}

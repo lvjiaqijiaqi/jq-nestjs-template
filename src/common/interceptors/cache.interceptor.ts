@@ -30,10 +30,11 @@ export class CacheInterceptor implements NestInterceptor {
     next: CallHandler,
   ): Promise<Observable<any>> {
     // 获取缓存配置
-    const cacheOptions = this.reflector.getAllAndOverride<CacheDecoratorOptions>(
-      CACHE_OPTIONS_METADATA,
-      [context.getHandler(), context.getClass()],
-    );
+    const cacheOptions =
+      this.reflector.getAllAndOverride<CacheDecoratorOptions>(
+        CACHE_OPTIONS_METADATA,
+        [context.getHandler(), context.getClass()],
+      );
 
     // 如果没有缓存配置，直接执行
     if (!cacheOptions) {
@@ -46,7 +47,12 @@ export class CacheInterceptor implements NestInterceptor {
     const args = context.getArgs();
 
     // 生成缓存键
-    const cacheKey = this.generateCacheKey(className, methodName, args, cacheOptions);
+    const cacheKey = this.generateCacheKey(
+      className,
+      methodName,
+      args,
+      cacheOptions,
+    );
 
     // 检查条件
     if (cacheOptions.condition && !cacheOptions.condition(args)) {
@@ -72,7 +78,7 @@ export class CacheInterceptor implements NestInterceptor {
 
       // 缓存未命中，执行原方法并缓存结果
       this.logger.debug(`Cache miss for key: ${cacheKey}`);
-      
+
       return next.handle().pipe(
         tap(async (result) => {
           // 检查结果条件
@@ -89,7 +95,10 @@ export class CacheInterceptor implements NestInterceptor {
             await this.cacheService.set(cacheKey, result, cacheOptions);
             this.logger.debug(`Cached result for key: ${cacheKey}`);
           } catch (error) {
-            this.logger.error(`Failed to cache result for key ${cacheKey}:`, error);
+            this.logger.error(
+              `Failed to cache result for key ${cacheKey}:`,
+              error,
+            );
           }
         }),
       );
@@ -109,10 +118,11 @@ export class CacheInterceptor implements NestInterceptor {
     args: any[],
     options: CacheDecoratorOptions,
   ): string {
-    const keyTemplate = this.reflector.getAllAndOverride<string | ((args: any[]) => string)>(
-      CACHE_KEY_METADATA,
-      [args[0], args[1]], // handler, class
-    ) || options.key;
+    const keyTemplate =
+      this.reflector.getAllAndOverride<string | ((args: any[]) => string)>(
+        CACHE_KEY_METADATA,
+        [args[0], args[1]], // handler, class
+      ) || options.key;
 
     return CacheKeyGenerator.generate(className, methodName, args, keyTemplate);
   }
@@ -197,7 +207,11 @@ export class CacheEvictInterceptor implements NestInterceptor {
         keysToEvict = [options.key];
       } else {
         // 默认键生成
-        const defaultKey = CacheKeyGenerator.generate(className, methodName, args);
+        const defaultKey = CacheKeyGenerator.generate(
+          className,
+          methodName,
+          args,
+        );
         keysToEvict = [defaultKey];
       }
 
@@ -223,10 +237,10 @@ export class CachePutInterceptor implements NestInterceptor {
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const putOptions = this.reflector.getAllAndOverride<CacheDecoratorOptions>('cache_put', [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const putOptions = this.reflector.getAllAndOverride<CacheDecoratorOptions>(
+      'cache_put',
+      [context.getHandler(), context.getClass()],
+    );
 
     if (!putOptions) {
       return next.handle();
@@ -249,8 +263,13 @@ export class CachePutInterceptor implements NestInterceptor {
 
         try {
           // 生成缓存键
-          const cacheKey = CacheKeyGenerator.generate(className, methodName, args, putOptions.key);
-          
+          const cacheKey = CacheKeyGenerator.generate(
+            className,
+            methodName,
+            args,
+            putOptions.key,
+          );
+
           // 更新缓存
           await this.cacheService.set(cacheKey, result, putOptions);
           this.logger.debug(`Updated cache for key: ${cacheKey}`);
@@ -260,4 +279,4 @@ export class CachePutInterceptor implements NestInterceptor {
       }),
     );
   }
-} 
+}

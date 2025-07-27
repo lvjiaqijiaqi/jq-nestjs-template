@@ -13,31 +13,24 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    
     "test:unit": "jest --testPathPattern=\"src/.*\\.spec\\.ts$\" --testTimeout=30000",
     "test:unit:watch": "jest --testPathPattern=\"src/.*\\.spec\\.ts$\" --watch",
     "test:unit:cov": "jest --testPathPattern=\"src/.*\\.spec\\.ts$\" --coverage",
-    
     "test:integration": "jest --testPathPattern=\"test/integration/.*\\.test\\.ts$\" --testTimeout=60000",
     "test:integration:watch": "jest --testPathPattern=\"test/integration/.*\\.test\\.ts$\" --watch",
-    
     "test:e2e:run": "jest --testPathPattern=\"test/e2e/.*\\.e2e-spec\\.ts$\" --testTimeout=120000 --runInBand",
     "test:e2e:watch": "jest --testPathPattern=\"test/e2e/.*\\.e2e-spec\\.ts$\" --watch --runInBand",
-    
     "test:all": "jest --testTimeout=60000 --detectOpenHandles --forceExit",
     "test:all:cov": "jest --coverage --testTimeout=60000 --detectOpenHandles --forceExit",
-    
     "test:ci": "jest --ci --coverage --testTimeout=60000 --detectOpenHandles --forceExit --passWithNoTests",
     "test:clear": "jest --clearCache",
     "test:setup": "./scripts/test.sh setup",
     "test:clean": "./scripts/test.sh clean",
-    
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:generate": "npm run typeorm -- -d data-source.ts migration:generate",
     "migration:create": "npm run typeorm -- migration:create",
@@ -46,7 +39,20 @@
     "migration:show": "npm run typeorm -- -d data-source.ts migration:show",
     "schema:sync": "npm run typeorm -- -d data-source.ts schema:sync",
     "schema:drop": "npm run typeorm -- -d data-source.ts schema:drop",
-    "seed:auth": "ts-node src/scripts/seed-auth.ts"
+    "seed:auth": "ts-node src/scripts/seed-auth.ts",
+    "prepare": "husky install",
+    "commit": "git-cz",
+    "check": "npm run lint && npm run test:unit",
+    "check:all": "npm run lint && npm run test:all",
+    "docker:build": "docker build -t jq-nestjs-app .",
+    "docker:build:dev": "docker build -f Dockerfile.dev -t jq-nestjs-app:dev .",
+    "docker:up": "docker-compose up -d",
+    "docker:up:dev": "docker-compose -f docker-compose.dev.yml up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "deploy:dev": "./scripts/deploy.sh dev",
+    "deploy:staging": "./scripts/deploy.sh staging",
+    "deploy:prod": "./scripts/deploy.sh prod"
   },
   "dependencies": {
     "@nestjs/bull": "^11.0.3",
@@ -89,6 +95,8 @@
     "xss": "^1.0.15"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@faker-js/faker": "^9.9.0",
@@ -109,9 +117,11 @@
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
     "globals": "^16.0.0",
+    "husky": "^9.1.7",
     "jest": "^29.7.0",
     "jest-extended": "^6.0.0",
     "jest-mock-extended": "^4.0.0",
+    "lint-staged": "^16.1.2",
     "nock": "^14.0.7",
     "prettier": "^3.4.2",
     "source-map-support": "^0.5.21",

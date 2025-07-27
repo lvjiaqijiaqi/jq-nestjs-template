@@ -5,8 +5,8 @@ import { Permission } from './permission.entity';
 import { User } from '../../user/entities/user.entity';
 
 export enum RoleType {
-  SYSTEM = 'system',     // 系统角色，不可删除
-  CUSTOM = 'custom',     // 自定义角色，可编辑删除
+  SYSTEM = 'system', // 系统角色，不可删除
+  CUSTOM = 'custom', // 自定义角色，可编辑删除
 }
 
 @Entity('roles')
@@ -36,10 +36,10 @@ export class Role extends BaseEntity {
   })
   description?: string;
 
-  @ApiProperty({ 
-    description: '角色类型', 
-    enum: RoleType, 
-    example: RoleType.CUSTOM 
+  @ApiProperty({
+    description: '角色类型',
+    enum: RoleType,
+    example: RoleType.CUSTOM,
   })
   @Column({
     type: 'enum',
@@ -82,7 +82,7 @@ export class Role extends BaseEntity {
   sort: number;
 
   // 角色拥有的权限
-  @ManyToMany(() => Permission, permission => permission.roles, {
+  @ManyToMany(() => Permission, (permission) => permission.roles, {
     cascade: true,
   })
   @JoinTable({
@@ -99,7 +99,7 @@ export class Role extends BaseEntity {
   permissions: Permission[];
 
   // 拥有此角色的用户
-  @OneToMany(() => User, user => user.role)
+  @OneToMany(() => User, (user) => user.role)
   users: User[];
 
   /**
@@ -107,10 +107,13 @@ export class Role extends BaseEntity {
    * @param permissionName 权限名称
    */
   hasPermission(permissionName: string): boolean {
-    return this.permissions?.some(permission => 
-      permission.name === permissionName || 
-      permission.fullPermission === permissionName
-    ) || false;
+    return (
+      this.permissions?.some(
+        (permission) =>
+          permission.name === permissionName ||
+          permission.fullPermission === permissionName,
+      ) || false
+    );
   }
 
   /**
@@ -129,4 +132,4 @@ export class Role extends BaseEntity {
   isSystemRole(): boolean {
     return this.type === RoleType.SYSTEM;
   }
-} 
+}

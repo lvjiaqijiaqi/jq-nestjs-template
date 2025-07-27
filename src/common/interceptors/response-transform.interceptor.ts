@@ -85,4 +85,4 @@ export function SkipResponseTransform() {
       Reflect.defineMetadata(SKIP_RESPONSE_TRANSFORM, true, target);
     }
   };
-} 
+}

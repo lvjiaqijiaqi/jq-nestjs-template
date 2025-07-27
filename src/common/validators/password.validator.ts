@@ -1,10 +1,18 @@
-import { ValidatorConstraint, ValidatorConstraintInterface, ValidationArguments, registerDecorator, ValidationOptions } from 'class-validator';
+import {
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+  ValidationArguments,
+  registerDecorator,
+  ValidationOptions,
+} from 'class-validator';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 @ValidatorConstraint({ name: 'isStrongPassword', async: false })
 @Injectable()
-export class IsStrongPasswordConstraint implements ValidatorConstraintInterface {
+export class IsStrongPasswordConstraint
+  implements ValidatorConstraintInterface
+{
   constructor(private readonly configService: ConfigService) {}
 
   validate(password: string, args: ValidationArguments): boolean {
@@ -34,7 +42,10 @@ export class IsStrongPasswordConstraint implements ValidatorConstraintInterface 
     }
 
     // 检查特殊字符
-    if (config.requireSymbols && !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    if (
+      config.requireSymbols &&
+      !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+    ) {
       errors.push('至少包含一个特殊字符');
     }
 
@@ -46,7 +57,7 @@ export class IsStrongPasswordConstraint implements ValidatorConstraintInterface 
 
   defaultMessage(args: ValidationArguments): string {
     const errors = (args as any).errors || [];
-    return errors.length > 0 
+    return errors.length > 0
       ? `密码强度不足: ${errors.join(', ')}`
       : '密码强度不足';
   }
@@ -62,4 +73,4 @@ export function IsStrongPassword(validationOptions?: ValidationOptions) {
       validator: IsStrongPasswordConstraint,
     });
   };
-} 
+}

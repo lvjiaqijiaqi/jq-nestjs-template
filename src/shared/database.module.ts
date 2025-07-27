@@ -15,39 +15,39 @@ import { DataSource } from 'typeorm';
         username: configService.get<string>('database.username'),
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.database'),
-        
+
         // MySQL 特定配置
         charset: configService.get<string>('database.charset'),
         timezone: configService.get<string>('database.timezone'),
-        
+
         // 实体配置
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-        
+
         // 同步配置 (开发环境)
         synchronize: configService.get<boolean>('database.synchronize'),
-        
+
         // 日志配置
         logging: configService.get<boolean>('database.logging'),
-        
+
         // 迁移配置
         migrations: [__dirname + '/../../migrations/*{.ts,.js}'],
         migrationsRun: false,
         migrationsTableName: 'migrations',
-        
+
         // 连接池配置
         extra: configService.get('database.extra'),
-        
+
         // SSL配置
         ssl: configService.get('database.ssl'),
-        
+
         // 其他配置
         dropSchema: false,
         keepConnectionAlive: true,
         autoLoadEntities: true,
-        
+
         // 命名策略
         namingStrategy: undefined,
-        
+
         // 缓存配置
         cache: {
           type: 'redis',
@@ -61,7 +61,7 @@ import { DataSource } from 'typeorm';
         },
       }),
       inject: [ConfigService],
-      
+
       // 数据源工厂，用于迁移和CLI
       dataSourceFactory: async (options) => {
         if (!options) {
@@ -74,4 +74,4 @@ import { DataSource } from 'typeorm';
   ],
   exports: [TypeOrmModule],
 })
-export class DatabaseModule {} 
+export class DatabaseModule {}

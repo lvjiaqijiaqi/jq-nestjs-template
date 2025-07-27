@@ -20,7 +20,9 @@ export class TestHelpers {
   /**
    * 创建认证用户并获取token
    */
-  async createAuthenticatedUser(userData?: Partial<User>): Promise<{ user: User; accessToken: string; refreshToken: string }> {
+  async createAuthenticatedUser(
+    userData?: Partial<User>,
+  ): Promise<{ user: User; accessToken: string; refreshToken: string }> {
     const userRepository = this.dataSource.getRepository(User);
     const roleRepository = this.dataSource.getRepository(Role);
 
@@ -72,7 +74,11 @@ export class TestHelpers {
   /**
    * 创建管理员用户并获取token
    */
-  async createAdminUser(): Promise<{ user: User; accessToken: string; refreshToken: string }> {
+  async createAdminUser(): Promise<{
+    user: User;
+    accessToken: string;
+    refreshToken: string;
+  }> {
     const userRepository = this.dataSource.getRepository(User);
     const roleRepository = this.dataSource.getRepository(Role);
 
@@ -103,7 +109,11 @@ export class TestHelpers {
   /**
    * 发送认证请求
    */
-  async authenticatedRequest(method: 'get' | 'post' | 'put' | 'patch' | 'delete', url: string, token: string) {
+  async authenticatedRequest(
+    method: 'get' | 'post' | 'put' | 'patch' | 'delete',
+    url: string,
+    token: string,
+  ) {
     const req = request(this.app.getHttpServer())[method](url);
     return req.set('Authorization', `Bearer ${token}`);
   }
@@ -112,7 +122,7 @@ export class TestHelpers {
    * 等待指定时间
    */
   async sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -137,10 +147,13 @@ export class TestHelpers {
   /**
    * 为角色分配权限
    */
-  async assignPermissionToRole(roleId: string, permissionId: string): Promise<void> {
+  async assignPermissionToRole(
+    roleId: string,
+    permissionId: string,
+  ): Promise<void> {
     await this.dataSource.query(
       'INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)',
-      [roleId, permissionId]
+      [roleId, permissionId],
     );
   }
 
@@ -155,7 +168,9 @@ export class TestHelpers {
    * 获取表的记录数
    */
   async getTableCount(tableName: string): Promise<number> {
-    const result = await this.dataSource.query(`SELECT COUNT(*) as count FROM ${tableName}`);
+    const result = await this.dataSource.query(
+      `SELECT COUNT(*) as count FROM ${tableName}`,
+    );
     return parseInt(result[0].count);
   }
 
@@ -185,12 +200,16 @@ export class TestHelpers {
   /**
    * 验证错误响应
    */
-  validateErrorResponse(response: any, expectedCode: number, expectedErrorCode?: string) {
+  validateErrorResponse(
+    response: any,
+    expectedCode: number,
+    expectedErrorCode?: string,
+  ) {
     expect(response.status).toBe(expectedCode);
     expect(response.body).toHaveProperty('code');
     expect(response.body).toHaveProperty('message');
     expect(response.body).toHaveProperty('timestamp');
-    
+
     if (expectedErrorCode) {
       expect(response.body.code).toBe(expectedErrorCode);
     }
@@ -245,4 +264,4 @@ export class TestHelpers {
   expectMockCalledWith(mockFn: jest.Mock, ...args: any[]) {
     expect(mockFn).toHaveBeenCalledWith(...args);
   }
-} 
+}

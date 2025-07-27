@@ -19,4 +19,4 @@ import { configurations, validationSchema } from '../config';
   ],
   exports: [ConfigModule],
 })
-export class GlobalConfigModule {} 
+export class GlobalConfigModule {}

@@ -30,4 +30,4 @@ export class UpdateBaseDto {
   @IsOptional()
   @IsString()
   updatedBy?: string;
-} 
+}

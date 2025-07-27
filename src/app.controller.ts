@@ -20,9 +20,9 @@ export class AppController {
 
   @Public()
   @Get()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: '获取应用信息',
-    description: '获取应用的基本信息，包括名称、版本、环境等'
+    description: '获取应用的基本信息，包括名称、版本、环境等',
   })
   @ApiResponse({
     status: 200,
@@ -38,14 +38,14 @@ export class AppController {
             environment: 'development',
             description: '企业级 NestJS 样板项目',
             author: 'Your Team',
-            license: 'MIT'
+            license: 'MIT',
           },
           timestamp: '2025-07-27T08:00:00.000Z',
           path: '/api/info',
-          requestId: 'req_12345'
-        }
-      }
-    }
+          requestId: 'req_12345',
+        },
+      },
+    },
   })
   getAppInfo(): ResponseDto<any> {
     const appInfo = {
@@ -67,8 +67,8 @@ export class AppController {
         'Swagger 文档',
         '数据验证',
         '分页查询',
-        '日志系统'
-      ]
+        '日志系统',
+      ],
     };
 
     return ResponseDto.success(appInfo, '获取应用信息成功');
@@ -76,9 +76,9 @@ export class AppController {
 
   @Public()
   @Get('health')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: '健康检查',
-    description: '检查应用和数据库的健康状态'
+    description: '检查应用和数据库的健康状态',
   })
   @ApiResponse({
     status: 200,
@@ -96,19 +96,19 @@ export class AppController {
             version: '1.0.0',
             database: {
               status: 'connected',
-              type: 'mysql'
+              type: 'mysql',
             },
             memory: {
               used: 128,
-              total: 256
-            }
+              total: 256,
+            },
           },
           timestamp: '2025-07-27T08:00:00.000Z',
           path: '/api/health',
-          requestId: 'req_12345'
-        }
-      }
-    }
+          requestId: 'req_12345',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 500,
@@ -122,20 +122,20 @@ export class AppController {
             status: 'error',
             database: {
               status: 'disconnected',
-              error: 'Connection timeout'
-            }
+              error: 'Connection timeout',
+            },
           },
           timestamp: '2025-07-27T08:00:00.000Z',
           path: '/api/health',
-          requestId: 'req_12345'
-        }
-      }
-    }
+          requestId: 'req_12345',
+        },
+      },
+    },
   })
   async healthCheck(): Promise<ResponseDto<any>> {
     try {
       await this.dataSource.query('SELECT 1'); // Check DB connection
-      
+
       const healthInfo = {
         status: 'ok',
         timestamp: new Date().toISOString(),
@@ -154,8 +154,8 @@ export class AppController {
           cors: this.configService.get<boolean>('app.cors.enabled', true),
           rateLimit: true,
           helmet: true,
-          validation: true
-        }
+          validation: true,
+        },
       };
 
       return ResponseDto.success(healthInfo, '系统运行正常');
@@ -176,7 +176,13 @@ export class AppController {
         },
       };
 
-      return ResponseDto.customError(500, '系统异常', undefined, undefined, errorInfo);
+      return ResponseDto.customError(
+        500,
+        '系统异常',
+        undefined,
+        undefined,
+        errorInfo,
+      );
     }
   }
 }

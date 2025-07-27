@@ -26,4 +26,4 @@ export { validationSchema } from './validation.schema';
 export type AppConfig = ReturnType<typeof appConfig>;
 export type DatabaseConfig = ReturnType<typeof databaseConfig>;
 export type JwtConfig = ReturnType<typeof jwtConfig>;
-export type RedisConfig = ReturnType<typeof redisConfig>; 
+export type RedisConfig = ReturnType<typeof redisConfig>;

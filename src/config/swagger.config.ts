@@ -4,9 +4,11 @@ import { DocumentBuilder, SwaggerDocumentOptions } from '@nestjs/swagger';
  * Swagger文档配置
  */
 export function createSwaggerConfig() {
-  return new DocumentBuilder()
-    .setTitle('NestJS 企业级样板 API')
-    .setDescription(`
+  return (
+    new DocumentBuilder()
+      .setTitle('NestJS 企业级样板 API')
+      .setDescription(
+        `
 # 企业级 NestJS 样板项目 API 文档
 
 这是一个功能完整的企业级 NestJS 样板项目，包含：
@@ -52,63 +54,65 @@ export function createSwaggerConfig() {
   "requestId": "req_12345"
 }
 \`\`\`
-    `)
-    .setVersion('1.0.0')
-    .setContact(
-      'API Support',
-      'https://github.com/your-org/nestjs-template',
-      'support@yourorg.com',
-    )
-    .setLicense('MIT', 'https://opensource.org/licenses/MIT')
-    .addServer('http://localhost:3000', '开发环境')
-    .addServer('https://api-staging.yourorg.com', '测试环境')
-    .addServer('https://api.yourorg.com', '生产环境')
-    
-    // JWT认证配置
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: '请输入JWT访问令牌',
-        in: 'header',
-      },
-      'JWT-auth',
-    )
-    
-    // API Key认证配置（如果需要）
-    .addApiKey(
-      {
-        type: 'apiKey',
-        name: 'X-API-Key',
-        in: 'header',
-        description: 'API密钥认证',
-      },
-      'X-API-Key',
-    )
-    
-    // 基础认证配置（如果需要）
-    .addBasicAuth(
-      {
-        type: 'http',
-        scheme: 'basic',
-        description: '基础认证 (用户名:密码)',
-      },
-      'basic-auth',
-    )
-    
-    // API标签分组
-    .addTag('应用', '应用基础信息和健康检查')
-    .addTag('认证', '用户认证和授权相关接口')
-    .addTag('用户', '用户管理相关接口')
-    .addTag('角色权限', '角色和权限管理接口')
-    .addTag('文件', '文件上传和管理接口')
-    .addTag('系统', '系统管理和配置接口')
-    
-    // 外部文档链接
-    .setExternalDoc('项目仓库', 'https://github.com/your-org/nestjs-template')
-    .build();
+    `,
+      )
+      .setVersion('1.0.0')
+      .setContact(
+        'API Support',
+        'https://github.com/your-org/nestjs-template',
+        'support@yourorg.com',
+      )
+      .setLicense('MIT', 'https://opensource.org/licenses/MIT')
+      .addServer('http://localhost:3000', '开发环境')
+      .addServer('https://api-staging.yourorg.com', '测试环境')
+      .addServer('https://api.yourorg.com', '生产环境')
+
+      // JWT认证配置
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          name: 'JWT',
+          description: '请输入JWT访问令牌',
+          in: 'header',
+        },
+        'JWT-auth',
+      )
+
+      // API Key认证配置（如果需要）
+      .addApiKey(
+        {
+          type: 'apiKey',
+          name: 'X-API-Key',
+          in: 'header',
+          description: 'API密钥认证',
+        },
+        'X-API-Key',
+      )
+
+      // 基础认证配置（如果需要）
+      .addBasicAuth(
+        {
+          type: 'http',
+          scheme: 'basic',
+          description: '基础认证 (用户名:密码)',
+        },
+        'basic-auth',
+      )
+
+      // API标签分组
+      .addTag('应用', '应用基础信息和健康检查')
+      .addTag('认证', '用户认证和授权相关接口')
+      .addTag('用户', '用户管理相关接口')
+      .addTag('角色权限', '角色和权限管理接口')
+      .addTag('文件', '文件上传和管理接口')
+      .addTag('系统', '系统管理和配置接口')
+
+      // 外部文档链接
+      .setExternalDoc('项目仓库', 'https://github.com/your-org/nestjs-template')
+      .build()
+  );
 }
 
 /**
@@ -116,16 +120,16 @@ export function createSwaggerConfig() {
  */
 export const swaggerOptions: SwaggerDocumentOptions = {
   operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
-  
+
   // 包含的模块
   include: [],
-  
+
   // 额外的模型
   extraModels: [],
-  
+
   // 深度限制
   deepScanRoutes: true,
-  
+
   // 忽略全局前缀
   ignoreGlobalPrefix: false,
 };
@@ -137,53 +141,53 @@ export const swaggerUiOptions = {
   swaggerOptions: {
     // 持久化认证信息
     persistAuthorization: true,
-    
+
     // 显示扩展信息
     displayExtensions: true,
-    
+
     // 显示操作ID
     displayOperationId: true,
-    
+
     // 默认模型扩展深度
     defaultModelExpandDepth: 3,
-    
+
     // 默认模型渲染
     defaultModelRendering: 'model' as const,
-    
+
     // 显示请求持续时间
     displayRequestDuration: true,
-    
+
     // 文档扩展
     docExpansion: 'list' as const,
-    
+
     // 过滤器
     filter: true,
-    
+
     // 最大显示的标签数量
     maxDisplayedTags: 50,
-    
+
     // 显示通用扩展
     showExtensions: true,
-    
+
     // 显示通用扩展
     showCommonExtensions: true,
-    
+
     // 支持的提交方法
     supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
-    
+
     // 验证器URL
     validatorUrl: null,
-    
+
     // 自定义CSS
     customCss: `
       .swagger-ui .topbar { display: none }
       .swagger-ui .info .title { color: #3b82f6 }
       .swagger-ui .scheme-container { background: #f8fafc; padding: 15px; border-radius: 5px; }
     `,
-    
+
     // 自定义站点标题
     customSiteTitle: 'NestJS 企业级样板 API 文档',
-    
+
     // 自定义favicon
     customfavIcon: '/favicon.ico',
   },
@@ -208,7 +212,7 @@ export const API_RESPONSE_EXAMPLES = {
       },
     },
   },
-  
+
   UNAUTHORIZED: {
     description: '未授权',
     content: {
@@ -223,7 +227,7 @@ export const API_RESPONSE_EXAMPLES = {
       },
     },
   },
-  
+
   FORBIDDEN: {
     description: '权限不足',
     content: {
@@ -238,7 +242,7 @@ export const API_RESPONSE_EXAMPLES = {
       },
     },
   },
-  
+
   NOT_FOUND: {
     description: '资源不存在',
     content: {
@@ -253,7 +257,7 @@ export const API_RESPONSE_EXAMPLES = {
       },
     },
   },
-  
+
   VALIDATION_ERROR: {
     description: '参数验证错误',
     content: {
@@ -274,7 +278,7 @@ export const API_RESPONSE_EXAMPLES = {
       },
     },
   },
-  
+
   RATE_LIMIT: {
     description: '请求频率超限',
     content: {
@@ -289,7 +293,7 @@ export const API_RESPONSE_EXAMPLES = {
       },
     },
   },
-  
+
   INTERNAL_ERROR: {
     description: '服务器内部错误',
     content: {
@@ -304,4 +308,4 @@ export const API_RESPONSE_EXAMPLES = {
       },
     },
   },
-}; 
+};

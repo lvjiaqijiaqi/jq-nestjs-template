@@ -32,7 +32,7 @@ import { AuthController } from './controllers/auth.controller';
   imports: [
     // Passport 配置
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    
+
     // JWT 配置
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -46,31 +46,31 @@ import { AuthController } from './controllers/auth.controller';
       }),
       inject: [ConfigService],
     }),
-    
+
     // TypeORM 实体
     TypeOrmModule.forFeature([User, Role, Permission]),
   ],
-  
+
   controllers: [AuthController],
-  
+
   providers: [
     // 服务
     AuthService,
     AuthSeederService,
-    
+
     // Repository
     UserRepository,
-    
+
     // 策略
     JwtStrategy,
     LocalStrategy,
-    
+
     // 守卫
     JwtAuthGuard,
     LocalAuthGuard,
     PermissionsGuard,
   ],
-  
+
   exports: [
     AuthService,
     JwtAuthGuard,
@@ -80,4 +80,4 @@ import { AuthController } from './controllers/auth.controller';
     PassportModule,
   ],
 })
-export class AuthModule {} 
+export class AuthModule {}

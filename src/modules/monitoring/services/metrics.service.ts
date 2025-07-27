@@ -62,7 +62,7 @@ export class MetricsService implements OnModuleInit {
 
   async onModuleInit() {
     const config = this.configService.get('monitoring.metrics');
-    
+
     if (config.enabled) {
       this.initializeMetrics();
       this.startCollecting();
@@ -75,10 +75,10 @@ export class MetricsService implements OnModuleInit {
    */
   private initializeMetrics() {
     const config = this.configService.get('monitoring.metrics');
-    
+
     // 设置默认标签
     this.registry.setDefaultLabels(config.defaultLabels);
-    
+
     // 如果启用默认指标收集
     if (config.collectDefaultMetrics) {
       prometheus.collectDefaultMetrics({
@@ -89,10 +89,10 @@ export class MetricsService implements OnModuleInit {
 
     // 初始化HTTP指标
     this.initializeHttpMetrics();
-    
+
     // 初始化业务指标
     this.initializeBusinessMetrics();
-    
+
     // 初始化系统指标
     this.initializeSystemMetrics();
   }
@@ -242,7 +242,7 @@ export class MetricsService implements OnModuleInit {
    */
   private startCollecting() {
     const config = this.configService.get('monitoring.metrics');
-    
+
     this.collectInterval = setInterval(() => {
       this.collectSystemMetrics();
     }, config.collectInterval);
@@ -257,19 +257,22 @@ export class MetricsService implements OnModuleInit {
       const cpus = os.cpus();
       let totalIdle = 0;
       let totalTick = 0;
-      
+
       cpus.forEach((cpu, index) => {
         const cpuTimes = cpu.times;
         const idle = cpuTimes.idle;
-        const total = Object.values(cpuTimes).reduce((acc, time) => acc + time, 0);
-        
+        const total = Object.values(cpuTimes).reduce(
+          (acc, time) => acc + time,
+          0,
+        );
+
         totalIdle += idle;
         totalTick += total;
-        
+
         const usage = 100 - (idle / total) * 100;
         this.systemMetrics.cpuUsage.set({ core: index.toString() }, usage);
       });
-      
+
       const totalUsage = 100 - (totalIdle / totalTick) * 100;
       this.systemMetrics.cpuUsage.set({ core: 'all' }, totalUsage);
 
@@ -280,17 +283,37 @@ export class MetricsService implements OnModuleInit {
         free: os.freemem(),
       };
 
-      this.systemMetrics.memoryUsage.set({ type: 'process_rss' }, processMemory.rss);
-      this.systemMetrics.memoryUsage.set({ type: 'process_heap_used' }, processMemory.heapUsed);
-      this.systemMetrics.memoryUsage.set({ type: 'process_heap_total' }, processMemory.heapTotal);
-      this.systemMetrics.memoryUsage.set({ type: 'process_external' }, processMemory.external);
-      this.systemMetrics.memoryUsage.set({ type: 'system_total' }, systemMemory.total);
-      this.systemMetrics.memoryUsage.set({ type: 'system_free' }, systemMemory.free);
-      this.systemMetrics.memoryUsage.set({ type: 'system_used' }, systemMemory.total - systemMemory.free);
+      this.systemMetrics.memoryUsage.set(
+        { type: 'process_rss' },
+        processMemory.rss,
+      );
+      this.systemMetrics.memoryUsage.set(
+        { type: 'process_heap_used' },
+        processMemory.heapUsed,
+      );
+      this.systemMetrics.memoryUsage.set(
+        { type: 'process_heap_total' },
+        processMemory.heapTotal,
+      );
+      this.systemMetrics.memoryUsage.set(
+        { type: 'process_external' },
+        processMemory.external,
+      );
+      this.systemMetrics.memoryUsage.set(
+        { type: 'system_total' },
+        systemMemory.total,
+      );
+      this.systemMetrics.memoryUsage.set(
+        { type: 'system_free' },
+        systemMemory.free,
+      );
+      this.systemMetrics.memoryUsage.set(
+        { type: 'system_used' },
+        systemMemory.total - systemMemory.free,
+      );
 
       // 进程运行时间
       this.systemMetrics.processUptime.set(process.uptime());
-
     } catch (error) {
       this.logger.error('Failed to collect system metrics:', error);
     }
@@ -299,18 +322,25 @@ export class MetricsService implements OnModuleInit {
   /**
    * 记录HTTP请求指标
    */
-  recordHttpRequest(method: string, route: string, statusCode: number, duration: number, requestSize?: number, responseSize?: number) {
+  recordHttpRequest(
+    method: string,
+    route: string,
+    statusCode: number,
+    duration: number,
+    requestSize?: number,
+    responseSize?: number,
+  ) {
     if (!this.httpMetrics) return;
 
     const labels = { method, route, status_code: statusCode.toString() };
-    
+
     this.httpMetrics.requests.inc(labels);
     this.httpMetrics.requestDuration.observe(labels, duration / 1000); // 转换为秒
-    
+
     if (requestSize !== undefined) {
       this.httpMetrics.requestSize.observe({ method, route }, requestSize);
     }
-    
+
     if (responseSize !== undefined) {
       this.httpMetrics.responseSize.observe({ method, route }, responseSize);
     }
@@ -327,7 +357,10 @@ export class MetricsService implements OnModuleInit {
   /**
    * 记录用户登录指标
    */
-  recordUserLogin(status: 'success' | 'failed', method: 'password' | 'oauth' | 'sso') {
+  recordUserLogin(
+    status: 'success' | 'failed',
+    method: 'password' | 'oauth' | 'sso',
+  ) {
     if (!this.businessMetrics) return;
     this.businessMetrics.userLogins.inc({ status, method });
   }
@@ -335,7 +368,10 @@ export class MetricsService implements OnModuleInit {
   /**
    * 记录邮件发送指标
    */
-  recordEmailSent(type: 'single' | 'bulk' | 'template', status: 'success' | 'failed') {
+  recordEmailSent(
+    type: 'single' | 'bulk' | 'template',
+    status: 'success' | 'failed',
+  ) {
     if (!this.businessMetrics) return;
     this.businessMetrics.emailsSent.inc({ type, status });
   }
@@ -351,7 +387,11 @@ export class MetricsService implements OnModuleInit {
   /**
    * 记录队列作业指标
    */
-  recordQueueJob(queue: string, jobType: string, status: 'completed' | 'failed' | 'retried') {
+  recordQueueJob(
+    queue: string,
+    jobType: string,
+    status: 'completed' | 'failed' | 'retried',
+  ) {
     if (!this.businessMetrics) return;
     this.businessMetrics.queueJobs.inc({ queue, job_type: jobType, status });
   }
@@ -359,7 +399,10 @@ export class MetricsService implements OnModuleInit {
   /**
    * 记录缓存操作指标
    */
-  recordCacheOperation(operation: 'get' | 'set' | 'del' | 'clear', status: 'hit' | 'miss' | 'success' | 'error') {
+  recordCacheOperation(
+    operation: 'get' | 'set' | 'del' | 'clear',
+    status: 'hit' | 'miss' | 'success' | 'error',
+  ) {
     if (!this.businessMetrics) return;
     this.businessMetrics.cacheOperations.inc({ operation, status });
   }
@@ -375,7 +418,11 @@ export class MetricsService implements OnModuleInit {
   /**
    * 创建自定义计数器
    */
-  createCounter(name: string, help: string, labelNames: string[] = []): prometheus.Counter<string> {
+  createCounter(
+    name: string,
+    help: string,
+    labelNames: string[] = [],
+  ): prometheus.Counter<string> {
     const prefix = this.configService.get('monitoring.metrics.prefix');
     return new prometheus.Counter({
       name: `${prefix}${name}`,
@@ -388,7 +435,11 @@ export class MetricsService implements OnModuleInit {
   /**
    * 创建自定义仪表盘
    */
-  createGauge(name: string, help: string, labelNames: string[] = []): prometheus.Gauge<string> {
+  createGauge(
+    name: string,
+    help: string,
+    labelNames: string[] = [],
+  ): prometheus.Gauge<string> {
     const prefix = this.configService.get('monitoring.metrics.prefix');
     return new prometheus.Gauge({
       name: `${prefix}${name}`,
@@ -401,7 +452,12 @@ export class MetricsService implements OnModuleInit {
   /**
    * 创建自定义直方图
    */
-  createHistogram(name: string, help: string, buckets?: number[], labelNames: string[] = []): prometheus.Histogram<string> {
+  createHistogram(
+    name: string,
+    help: string,
+    buckets?: number[],
+    labelNames: string[] = [],
+  ): prometheus.Histogram<string> {
     const prefix = this.configService.get('monitoring.metrics.prefix');
     return new prometheus.Histogram({
       name: `${prefix}${name}`,
@@ -468,4 +524,4 @@ export class MetricsService implements OnModuleInit {
       this.logger.log('Metrics collection stopped');
     }
   }
-} 
+}

@@ -4,9 +4,9 @@ import { AuthSeederService } from '../modules/auth/services/seeder.service';
 
 async function runSeed() {
   console.log('🌱 开始运行认证种子数据...');
-  
+
   const app = await NestFactory.createApplicationContext(AppModule);
-  
+
   try {
     const authSeeder = app.get(AuthSeederService);
     await authSeeder.seed();
@@ -19,4 +19,4 @@ async function runSeed() {
   }
 }
 
-runSeed(); 
+runSeed();

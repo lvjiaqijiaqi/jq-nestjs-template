@@ -36,7 +36,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       { id: userId },
       {
         relations: ['role', 'role.permissions'],
-      }
+      },
     );
 
     if (!user) {
@@ -53,13 +53,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       userId: user.id,
       username: user.username,
       email: user.email,
-      role: user.role ? {
-        id: user.role.id,
-        name: user.role.name,
-        displayName: user.role.displayName,
-        permissions: user.role.permissions?.map(p => p.fullPermission) || [],
-      } : null,
+      role: user.role
+        ? {
+            id: user.role.id,
+            name: user.role.name,
+            displayName: user.role.displayName,
+            permissions:
+              user.role.permissions?.map((p) => p.fullPermission) || [],
+          }
+        : null,
       user, // 完整的用户对象
     };
   }
-} 
+}

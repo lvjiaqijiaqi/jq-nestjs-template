@@ -1,20 +1,26 @@
-import { IsEmail, IsString, MinLength, MaxLength, IsOptional } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  MinLength,
+  MaxLength,
+  IsOptional,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: '登录账号（用户名或邮箱）',
-    example: 'admin@example.com' 
+    example: 'admin@example.com',
   })
   @IsString()
   @MinLength(3)
   @MaxLength(100)
   account: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '密码',
     example: 'password123',
-    minLength: 6 
+    minLength: 6,
   })
   @IsString()
   @MinLength(6)
@@ -23,59 +29,59 @@ export class LoginDto {
 }
 
 export class RegisterDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: '用户名',
     example: 'john_doe',
     minLength: 3,
-    maxLength: 50 
+    maxLength: 50,
   })
   @IsString()
   @MinLength(3)
   @MaxLength(50)
   username: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '邮箱地址',
-    example: 'john@example.com' 
+    example: 'john@example.com',
   })
   @IsEmail()
   @MaxLength(100)
   email: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '密码',
     example: 'password123',
-    minLength: 6 
+    minLength: 6,
   })
   @IsString()
   @MinLength(6)
   @MaxLength(50)
   password: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '确认密码',
     example: 'password123',
-    minLength: 6 
+    minLength: 6,
   })
   @IsString()
   @MinLength(6)
   @MaxLength(50)
   confirmPassword: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '昵称',
     example: 'John Doe',
-    required: false 
+    required: false,
   })
   @IsOptional()
   @IsString()
   @MaxLength(100)
   nickname?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '手机号',
     example: '13800138000',
-    required: false 
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -84,37 +90,37 @@ export class RegisterDto {
 }
 
 export class RefreshTokenDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: '刷新令牌',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' 
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
   @IsString()
   refreshToken: string;
 }
 
 export class ChangePasswordDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: '当前密码',
-    example: 'oldpassword123' 
+    example: 'oldpassword123',
   })
   @IsString()
   @MinLength(6)
   @MaxLength(50)
   currentPassword: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '新密码',
     example: 'newpassword123',
-    minLength: 6 
+    minLength: 6,
   })
   @IsString()
   @MinLength(6)
   @MaxLength(50)
   newPassword: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '确认新密码',
-    example: 'newpassword123' 
+    example: 'newpassword123',
   })
   @IsString()
   @MinLength(6)
@@ -123,9 +129,9 @@ export class ChangePasswordDto {
 }
 
 export class ForgotPasswordDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: '邮箱地址',
-    example: 'john@example.com' 
+    example: 'john@example.com',
   })
   @IsEmail()
   @MaxLength(100)
@@ -133,26 +139,26 @@ export class ForgotPasswordDto {
 }
 
 export class ResetPasswordDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: '重置令牌',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' 
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
   @IsString()
   token: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '新密码',
     example: 'newpassword123',
-    minLength: 6 
+    minLength: 6,
   })
   @IsString()
   @MinLength(6)
   @MaxLength(50)
   password: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '确认新密码',
-    example: 'newpassword123' 
+    example: 'newpassword123',
   })
   @IsString()
   @MinLength(6)
@@ -230,4 +236,4 @@ export class UserProfileDto {
     displayName: string;
     permissions: string[];
   };
-} 
+}

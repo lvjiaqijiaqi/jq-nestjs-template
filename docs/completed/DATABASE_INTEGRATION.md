@@ -5,6 +5,7 @@
 ### ✅ 数据库集成
 
 #### ORM 集成 ✅
+
 - [x] 选择 TypeORM 作为 ORM 框架
 - [x] 配置 MySQL 数据库连接
 - [x] 实体/模型定义规范
@@ -12,6 +13,7 @@
 - [x] 种子数据管理框架
 
 #### Repository 模式 ✅
+
 - [x] 通用 Repository 基类
 - [x] 数据访问层抽象
 - [x] 事务管理支持
@@ -49,7 +51,7 @@ src/
 # TypeORM 相关命令
 npm run typeorm              # 运行 TypeORM CLI
 npm run migration:generate   # 生成迁移文件
-npm run migration:create     # 创建空迁移文件  
+npm run migration:create     # 创建空迁移文件
 npm run migration:run        # 运行迁移
 npm run migration:revert     # 回滚迁移
 npm run migration:show       # 显示迁移状态
@@ -60,17 +62,21 @@ npm run schema:drop          # 删除数据库架构
 ## 🏗️ 架构特点
 
 ### 1. 基础实体类 (BaseEntity)
+
 提供了所有实体的通用字段：
+
 - `id`: UUID 主键
 - `createdAt`: 创建时间
 - `updatedAt`: 更新时间
 - `deletedAt`: 删除时间（软删除）
 - `createdBy`: 创建者ID
-- `updatedBy`: 更新者ID  
+- `updatedBy`: 更新者ID
 - `version`: 版本号
 
 ### 2. 通用Repository基类 (BaseRepository)
+
 提供了常用的数据库操作方法：
+
 - CRUD 操作（创建、读取、更新、删除）
 - 批量操作支持
 - 分页查询
@@ -79,14 +85,18 @@ npm run schema:drop          # 删除数据库架构
 - 计数统计
 
 ### 3. 示例用户实体 (User)
+
 展示了如何使用基础实体类：
+
 - 用户基本信息（用户名、邮箱、密码等）
 - 枚举类型（状态、角色）
 - 索引配置
 - 字段验证
 
 ### 4. 用户Repository (UserRepository)
+
 展示了如何扩展基础Repository：
+
 - 业务特定的查询方法
 - 复杂查询构建
 - 数据唯一性检查
@@ -122,7 +132,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 export class YourEntity extends BaseEntity {
   @Column()
   name: string;
-  
+
   // 其他字段...
 }
 ```
@@ -144,7 +154,7 @@ export class YourRepository extends BaseRepository<YourEntity> {
   ) {
     super(repository);
   }
-  
+
   // 添加业务特定的方法...
 }
 ```
@@ -165,24 +175,28 @@ npm run migration:revert
 ### 5. 健康检查
 
 访问以下端点检查数据库连接状态：
+
 - `GET /health` - 系统健康检查（包含数据库状态）
 - `GET /info` - 应用信息
 
 ## 🔧 数据库连接配置
 
 ### 开发环境
+
 - 支持 `synchronize: true` 自动同步数据库结构
 - 启用详细日志记录
 - 支持热重载
 - 使用 utf8mb4 字符集支持完整 Unicode
 
 ### 生产环境
+
 - 使用迁移管理数据库结构变更
 - 关闭自动同步功能
 - 配置连接池和SSL
 - 优化 MySQL 性能参数
 
 ### 缓存配置
+
 - 集成 Redis 查询缓存
 - 30秒缓存时长
 - 支持分布式缓存
@@ -192,7 +206,7 @@ npm run migration:revert
 数据库集成已完成，接下来可以继续实施：
 
 1. **认证授权系统** - JWT 认证和 RBAC 权限控制
-2. **安全中间件** - 数据验证和安全防护  
+2. **安全中间件** - 数据验证和安全防护
 3. **API 文档** - Swagger 集成和文档生成
 4. **业务模块开发** - 基于现有的Repository模式开发具体业务
 
@@ -207,4 +221,4 @@ npm run migration:revert
 ---
 
 **数据库集成完成时间**: ${new Date().toISOString().split('T')[0]}
-**实施团队**: 项目开发团队 
+**实施团队**: 项目开发团队

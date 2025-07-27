@@ -1,4 +1,9 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
+import {
+  Injectable,
+  NestInterceptor,
+  ExecutionContext,
+  CallHandler,
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -28,7 +33,7 @@ export class XssFilterInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
-    
+
     try {
       // 过滤请求体中的XSS
       if (request.body && typeof request.body === 'object') {
@@ -43,7 +48,7 @@ export class XssFilterInterceptor implements NestInterceptor {
           value: sanitizedQuery,
           writable: true,
           enumerable: true,
-          configurable: true
+          configurable: true,
         });
       }
 
@@ -54,7 +59,7 @@ export class XssFilterInterceptor implements NestInterceptor {
           value: sanitizedParams,
           writable: true,
           enumerable: true,
-          configurable: true
+          configurable: true,
         });
       }
     } catch (error) {
@@ -63,7 +68,7 @@ export class XssFilterInterceptor implements NestInterceptor {
     }
 
     return next.handle().pipe(
-      map(data => {
+      map((data) => {
         // 可选：也可以过滤响应数据中的XSS
         return data;
       }),
@@ -76,7 +81,7 @@ export class XssFilterInterceptor implements NestInterceptor {
     }
 
     if (Array.isArray(obj)) {
-      return obj.map(item => this.sanitizeObject(item));
+      return obj.map((item) => this.sanitizeObject(item));
     }
 
     if (obj && typeof obj === 'object') {
@@ -91,4 +96,4 @@ export class XssFilterInterceptor implements NestInterceptor {
 
     return obj;
   }
-} 
+}

@@ -19,15 +19,15 @@ export default registerAs('logger', (): WinstonModuleOptions => {
         message,
         context,
       };
-      
+
       if (trace) {
         logObject.trace = trace;
       }
-      
+
       if (Object.keys(meta).length > 0) {
         logObject.meta = meta;
       }
-      
+
       return JSON.stringify(logObject);
     }),
   );
@@ -85,17 +85,17 @@ export default registerAs('logger', (): WinstonModuleOptions => {
     exitOnError: false,
     // 异常处理
     exceptionHandlers: [
-      new winston.transports.File({ 
+      new winston.transports.File({
         filename: 'logs/exceptions.log',
         format: logFormat,
       }),
     ],
     // 拒绝处理
     rejectionHandlers: [
-      new winston.transports.File({ 
+      new winston.transports.File({
         filename: 'logs/rejections.log',
         format: logFormat,
       }),
     ],
   };
-}); 
+});

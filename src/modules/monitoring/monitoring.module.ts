@@ -4,22 +4,17 @@ import { TerminusModule } from '@nestjs/terminus';
 import { HealthCheckService } from './services/health-check.service';
 import { MetricsService } from './services/metrics.service';
 import { MonitoringController } from './controllers/monitoring.controller';
-import { 
-  MetricsMiddleware, 
-  ActiveConnectionsMiddleware, 
-  ErrorRateMiddleware 
+import {
+  MetricsMiddleware,
+  ActiveConnectionsMiddleware,
+  ErrorRateMiddleware,
 } from './middleware/metrics.middleware';
 import { QueueModule } from '../queue/queue.module';
 import { CacheModule } from '../cache/cache.module';
 
 @Global()
 @Module({
-  imports: [
-    ConfigModule,
-    TerminusModule,
-    QueueModule,
-    CacheModule,
-  ],
+  imports: [ConfigModule, TerminusModule, QueueModule, CacheModule],
   controllers: [MonitoringController],
   providers: [
     HealthCheckService,
@@ -47,4 +42,4 @@ export class MonitoringModule implements NestModule {
       )
       .forRoutes('*');
   }
-} 
+}

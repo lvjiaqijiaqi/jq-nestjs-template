@@ -1,5 +1,21 @@
-import { Controller, Get, Post, Delete, Param, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Param,
+  Body,
+  Query,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+  ApiBody,
+} from '@nestjs/swagger';
 import { QueueService, QueueType, JobStatus } from '../services/queue.service';
 import { EmailJobData } from '../processors/email.processor';
 import { FileJobData } from '../processors/file.processor';
@@ -29,24 +45,65 @@ export class QueueController {
           code: 200,
           message: '获取成功',
           data: {
-            email: { waiting: 5, active: 2, completed: 100, failed: 3, delayed: 1, paused: 0 },
-            file: { waiting: 0, active: 1, completed: 50, failed: 1, delayed: 0, paused: 0 },
-            notification: { waiting: 10, active: 5, completed: 200, failed: 5, delayed: 2, paused: 0 },
-            data: { waiting: 2, active: 0, completed: 25, failed: 0, delayed: 0, paused: 0 },
-            report: { waiting: 1, active: 0, completed: 10, failed: 0, delayed: 0, paused: 0 }
-          }
-        }
-      }
-    }
+            email: {
+              waiting: 5,
+              active: 2,
+              completed: 100,
+              failed: 3,
+              delayed: 1,
+              paused: 0,
+            },
+            file: {
+              waiting: 0,
+              active: 1,
+              completed: 50,
+              failed: 1,
+              delayed: 0,
+              paused: 0,
+            },
+            notification: {
+              waiting: 10,
+              active: 5,
+              completed: 200,
+              failed: 5,
+              delayed: 2,
+              paused: 0,
+            },
+            data: {
+              waiting: 2,
+              active: 0,
+              completed: 25,
+              failed: 0,
+              delayed: 0,
+              paused: 0,
+            },
+            report: {
+              waiting: 1,
+              active: 0,
+              completed: 10,
+              failed: 0,
+              delayed: 0,
+              paused: 0,
+            },
+          },
+        },
+      },
+    },
   })
   async getAllQueueStats(): Promise<ResponseDto> {
     try {
       const stats = await this.queueService.getAllQueueStats();
       return ResponseDto.success(stats, '获取队列统计信息成功');
     } catch (error) {
-      return ResponseDto.customError(500, '获取队列统计信息失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '获取队列统计信息失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -62,14 +119,22 @@ export class QueueController {
     enum: QueueType,
     example: 'email',
   })
-  async getQueueStats(@Param('queueType') queueType: QueueType): Promise<ResponseDto> {
+  async getQueueStats(
+    @Param('queueType') queueType: QueueType,
+  ): Promise<ResponseDto> {
     try {
       const stats = await this.queueService.getQueueStats(queueType);
       return ResponseDto.success(stats, `获取${queueType}队列统计信息成功`);
     } catch (error) {
-      return ResponseDto.customError(500, '获取队列统计信息失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '获取队列统计信息失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -85,14 +150,22 @@ export class QueueController {
     enum: QueueType,
     example: 'email',
   })
-  async getQueueHealth(@Param('queueType') queueType: QueueType): Promise<ResponseDto> {
+  async getQueueHealth(
+    @Param('queueType') queueType: QueueType,
+  ): Promise<ResponseDto> {
     try {
       const health = await this.queueService.getQueueHealth(queueType);
       return ResponseDto.success(health, `获取${queueType}队列健康状态成功`);
     } catch (error) {
-      return ResponseDto.customError(500, '获取队列健康状态失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '获取队列健康状态失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -134,12 +207,23 @@ export class QueueController {
   ): Promise<ResponseDto> {
     try {
       const statusArray = status.split(',') as JobStatus[];
-      const jobs = await this.queueService.getJobs(queueType, statusArray, +start, +end);
+      const jobs = await this.queueService.getJobs(
+        queueType,
+        statusArray,
+        +start,
+        +end,
+      );
       return ResponseDto.success(jobs, `获取${queueType}队列作业列表成功`);
     } catch (error) {
-      return ResponseDto.customError(500, '获取队列作业列表失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '获取队列作业列表失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -161,40 +245,51 @@ export class QueueController {
       type: 'object',
       properties: {
         jobName: { type: 'string', example: 'send-email' },
-        data: { 
+        data: {
           type: 'object',
           example: {
             to: 'user@example.com',
             subject: '测试邮件',
-            html: '<p>这是一封测试邮件</p>'
-          }
+            html: '<p>这是一封测试邮件</p>',
+          },
         },
         options: {
           type: 'object',
           properties: {
             delay: { type: 'number', example: 0 },
             attempts: { type: 'number', example: 3 },
-            priority: { type: 'number', example: 50 }
-          }
-        }
+            priority: { type: 'number', example: 50 },
+          },
+        },
       },
-      required: ['jobName', 'data']
-    }
+      required: ['jobName', 'data'],
+    },
   })
   async addJob(
     @Param('queueType') queueType: QueueType,
     @Body() body: { jobName: string; data: any; options?: any },
   ): Promise<ResponseDto> {
     try {
-      const job = await this.queueService.addJob(queueType, body.jobName, body.data, body.options);
+      const job = await this.queueService.addJob(
+        queueType,
+        body.jobName,
+        body.data,
+        body.options,
+      );
       return ResponseDto.success(
         { jobId: job.id, jobName: body.jobName, queueType },
         `作业已添加到${queueType}队列`,
       );
     } catch (error) {
-      return ResponseDto.customError(500, '添加作业失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '添加作业失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -209,37 +304,51 @@ export class QueueController {
     schema: {
       type: 'object',
       properties: {
-        to: { 
+        to: {
           oneOf: [
             { type: 'string' },
-            { type: 'array', items: { type: 'string' } }
+            { type: 'array', items: { type: 'string' } },
           ],
-          example: 'user@example.com'
+          example: 'user@example.com',
         },
         subject: { type: 'string', example: '欢迎注册' },
         html: { type: 'string', example: '<p>欢迎使用我们的服务！</p>' },
         text: { type: 'string', example: '欢迎使用我们的服务！' },
         template: { type: 'string', example: 'welcome' },
-        variables: { 
+        variables: {
           type: 'object',
-          example: { name: '张三', url: 'https://example.com' }
+          example: { name: '张三', url: 'https://example.com' },
         },
-        priority: { type: 'string', enum: ['high', 'normal', 'low'], example: 'normal' }
+        priority: {
+          type: 'string',
+          enum: ['high', 'normal', 'low'],
+          example: 'normal',
+        },
       },
-      required: ['to', 'subject']
-    }
+      required: ['to', 'subject'],
+    },
   })
   async sendEmail(@Body() emailData: EmailJobData): Promise<ResponseDto> {
     try {
-      const job = await this.queueService.addJob(QueueType.EMAIL, 'send-email', emailData);
+      const job = await this.queueService.addJob(
+        QueueType.EMAIL,
+        'send-email',
+        emailData,
+      );
       return ResponseDto.success(
         { jobId: job.id, to: emailData.to, subject: emailData.subject },
         '邮件已添加到发送队列',
       );
     } catch (error) {
-      return ResponseDto.customError(500, '邮件发送失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '邮件发送失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -258,22 +367,32 @@ export class QueueController {
         fileName: { type: 'string', example: 'photo.jpg' },
         fileType: { type: 'string', example: 'image/jpeg' },
         fileSize: { type: 'number', example: 1048576 },
-        userId: { type: 'string', example: 'user123' }
+        userId: { type: 'string', example: 'user123' },
       },
-      required: ['filePath', 'fileName', 'fileType', 'fileSize']
-    }
+      required: ['filePath', 'fileName', 'fileType', 'fileSize'],
+    },
   })
   async uploadFile(@Body() fileData: FileJobData): Promise<ResponseDto> {
     try {
-      const job = await this.queueService.addJob(QueueType.FILE, 'upload-file', fileData);
+      const job = await this.queueService.addJob(
+        QueueType.FILE,
+        'upload-file',
+        fileData,
+      );
       return ResponseDto.success(
         { jobId: job.id, fileName: fileData.fileName },
         '文件已添加到处理队列',
       );
     } catch (error) {
-      return ResponseDto.customError(500, '文件上传失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '文件上传失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -302,9 +421,15 @@ export class QueueController {
       await this.queueService.removeJob(queueType, jobId);
       return ResponseDto.success(null, `作业${jobId}已从${queueType}队列删除`);
     } catch (error) {
-      return ResponseDto.customError(500, '删除作业失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '删除作业失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -331,11 +456,20 @@ export class QueueController {
   ): Promise<ResponseDto> {
     try {
       await this.queueService.retryJob(queueType, jobId);
-      return ResponseDto.success(null, `作业${jobId}已重新添加到${queueType}队列`);
+      return ResponseDto.success(
+        null,
+        `作业${jobId}已重新添加到${queueType}队列`,
+      );
     } catch (error) {
-      return ResponseDto.customError(500, '重试作业失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '重试作业失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -351,14 +485,22 @@ export class QueueController {
     enum: QueueType,
     example: 'email',
   })
-  async pauseQueue(@Param('queueType') queueType: QueueType): Promise<ResponseDto> {
+  async pauseQueue(
+    @Param('queueType') queueType: QueueType,
+  ): Promise<ResponseDto> {
     try {
       await this.queueService.pauseQueue(queueType);
       return ResponseDto.success(null, `${queueType}队列已暂停`);
     } catch (error) {
-      return ResponseDto.customError(500, '暂停队列失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '暂停队列失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -374,14 +516,22 @@ export class QueueController {
     enum: QueueType,
     example: 'email',
   })
-  async resumeQueue(@Param('queueType') queueType: QueueType): Promise<ResponseDto> {
+  async resumeQueue(
+    @Param('queueType') queueType: QueueType,
+  ): Promise<ResponseDto> {
     try {
       await this.queueService.resumeQueue(queueType);
       return ResponseDto.success(null, `${queueType}队列已恢复`);
     } catch (error) {
-      return ResponseDto.customError(500, '恢复队列失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '恢复队列失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -397,14 +547,22 @@ export class QueueController {
     enum: QueueType,
     example: 'email',
   })
-  async cleanQueue(@Param('queueType') queueType: QueueType): Promise<ResponseDto> {
+  async cleanQueue(
+    @Param('queueType') queueType: QueueType,
+  ): Promise<ResponseDto> {
     try {
       await this.queueService.cleanQueue(queueType);
       return ResponseDto.success(null, `${queueType}队列已清空`);
     } catch (error) {
-      return ResponseDto.customError(500, '清空队列失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '清空队列失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -446,15 +604,26 @@ export class QueueController {
     @Query('limit') limit = 100,
   ): Promise<ResponseDto> {
     try {
-      const cleaned = await this.queueService.cleanupJobs(queueType, +grace, +limit, type);
+      const cleaned = await this.queueService.cleanupJobs(
+        queueType,
+        +grace,
+        +limit,
+        type,
+      );
       return ResponseDto.success(
         { cleaned, type },
         `${queueType}队列清理完成，清理了${cleaned}个${type}作业`,
       );
     } catch (error) {
-      return ResponseDto.customError(500, '清理队列失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '清理队列失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
-} 
+}

@@ -78,15 +78,15 @@ export class SeederService {
   // 示例种子数据方法
   // private async seedUsers(manager: EntityManager): Promise<void> {
   //   const userRepository = manager.getRepository(User);
-  //   
+  //
   //   const adminUser = userRepository.create({
   //     username: 'admin',
   //     email: 'admin@example.com',
   //     password: await bcrypt.hash('admin123', 10),
   //     role: 'admin',
   //   });
-  //   
+  //
   //   await userRepository.save(adminUser);
   //   this.logger.log('管理员用户创建完成');
   // }
-} 
+}

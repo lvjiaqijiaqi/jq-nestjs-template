@@ -81,7 +81,7 @@ export const ERROR_CODES = {
   SYSTEM_INTERNAL_ERROR: { code: 900004, message: '系统内部错误' },
 } as const;
 
-export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES];
+export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
 
 /**
  * 根据HTTP状态码获取默认错误信息
@@ -113,4 +113,4 @@ export function getErrorByHttpStatus(statusCode: number): ErrorCode {
     default:
       return ERROR_CODES.UNKNOWN_ERROR;
   }
-} 
+}

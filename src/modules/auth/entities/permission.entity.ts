@@ -49,10 +49,10 @@ export class Permission extends BaseEntity {
   })
   description?: string;
 
-  @ApiProperty({ 
-    description: '权限动作', 
-    enum: PermissionAction, 
-    example: PermissionAction.CREATE 
+  @ApiProperty({
+    description: '权限动作',
+    enum: PermissionAction,
+    example: PermissionAction.CREATE,
   })
   @Column({
     type: 'enum',
@@ -61,10 +61,10 @@ export class Permission extends BaseEntity {
   })
   action: PermissionAction;
 
-  @ApiProperty({ 
-    description: '权限资源', 
-    enum: PermissionResource, 
-    example: PermissionResource.USER 
+  @ApiProperty({
+    description: '权限资源',
+    enum: PermissionResource,
+    example: PermissionResource.USER,
   })
   @Column({
     type: 'enum',
@@ -99,7 +99,7 @@ export class Permission extends BaseEntity {
   isActive: boolean;
 
   // 关联的角色
-  @ManyToMany(() => Role, role => role.permissions)
+  @ManyToMany(() => Role, (role) => role.permissions)
   roles: Role[];
 
   /**
@@ -108,4 +108,4 @@ export class Permission extends BaseEntity {
   get fullPermission(): string {
     return `${this.resource}:${this.action}`;
   }
-} 
+}

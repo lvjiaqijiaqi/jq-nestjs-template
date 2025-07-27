@@ -25,7 +25,10 @@ export class RoleFactory {
   /**
    * 创建多个角色测试数据
    */
-  static buildList(count: number, overrides: Partial<Role> = {}): Partial<Role>[] {
+  static buildList(
+    count: number,
+    overrides: Partial<Role> = {},
+  ): Partial<Role>[] {
     return Array.from({ length: count }, () => this.build(overrides));
   }
 
@@ -159,4 +162,4 @@ export class RoleFactory {
       ...overrides,
     };
   }
-} 
+}

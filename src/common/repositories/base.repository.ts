@@ -32,13 +32,16 @@ export abstract class BaseRepository<T extends BaseEntity> {
    * @param entitiesData 实体数据数组
    * @param userId 操作用户ID
    */
-  async createMany(entitiesData: DeepPartial<T>[], userId?: string): Promise<T[]> {
-    const entities = entitiesData.map(data =>
+  async createMany(
+    entitiesData: DeepPartial<T>[],
+    userId?: string,
+  ): Promise<T[]> {
+    const entities = entitiesData.map((data) =>
       this.repository.create({
         ...data,
         createdBy: userId,
         updatedBy: userId,
-      } as DeepPartial<T>)
+      } as DeepPartial<T>),
     );
     return await this.repository.save(entities);
   }
@@ -62,7 +65,7 @@ export abstract class BaseRepository<T extends BaseEntity> {
    */
   async findOne(
     where: FindOptionsWhere<T>,
-    options?: FindOneOptions<T>
+    options?: FindOneOptions<T>,
   ): Promise<T | null> {
     return await this.repository.findOne({
       where,
@@ -85,7 +88,7 @@ export abstract class BaseRepository<T extends BaseEntity> {
    */
   async findWithPagination(
     paginationDto: PaginationDto,
-    options?: FindManyOptions<T>
+    options?: FindManyOptions<T>,
   ): Promise<PaginatedResponseDto<T>> {
     const { page = 1, limit = 10 } = paginationDto;
     const skip = (page - 1) * limit;
@@ -108,7 +111,7 @@ export abstract class BaseRepository<T extends BaseEntity> {
   async update(
     id: string,
     updateData: DeepPartial<T>,
-    userId?: string
+    userId?: string,
   ): Promise<T | null> {
     await this.repository.update(id, {
       ...updateData,
@@ -126,7 +129,7 @@ export abstract class BaseRepository<T extends BaseEntity> {
   async updateMany(
     where: FindOptionsWhere<T>,
     updateData: DeepPartial<T>,
-    userId?: string
+    userId?: string,
   ): Promise<UpdateResult> {
     return await this.repository.update(where, {
       ...updateData,
@@ -197,4 +200,4 @@ export abstract class BaseRepository<T extends BaseEntity> {
   getRepository(): Repository<T> {
     return this.repository;
   }
-} 
+}

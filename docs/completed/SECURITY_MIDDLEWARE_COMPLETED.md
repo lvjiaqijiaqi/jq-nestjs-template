@@ -9,31 +9,36 @@
 ### 1. **安全中间件** ✅
 
 #### 🔹 Helmet 安全头配置
+
 - ✅ X-Frame-Options: 防止点击劫持
-- ✅ X-Content-Type-Options: 防止MIME类型嗅探  
+- ✅ X-Content-Type-Options: 防止MIME类型嗅探
 - ✅ X-XSS-Protection: XSS保护
 - ✅ Referrer-Policy: 引用策略控制
 - ✅ Permissions-Policy: 权限策略控制
 - ✅ Content-Security-Policy: 内容安全策略
 
 #### 🔹 CORS 跨域配置
+
 - ✅ 动态CORS策略配置
 - ✅ 允许的HTTP方法控制
 - ✅ 请求头白名单管理
 - ✅ 凭据传递控制
 
 #### 🔹 Rate Limiting 限流策略
+
 - ✅ 基于IP的请求频率限制
 - ✅ 可配置的时间窗口和请求次数
 - ✅ 全局限流守卫集成
 - ✅ 针对不同端点的差异化限流
 
 #### 🔹 请求体大小限制
+
 - ✅ 可配置的请求体大小限制
 - ✅ 参数数量限制
 - ✅ 防止拒绝服务攻击
 
 #### 🔹 IP 白名单/黑名单
+
 - ✅ 动态IP过滤机制
 - ✅ 支持多IP配置
 - ✅ 代理服务器兼容性
@@ -41,18 +46,21 @@
 ### 2. **数据验证与过滤** ✅
 
 #### 🔹 XSS 过滤
+
 - ✅ 全局XSS过滤拦截器
 - ✅ 请求体、查询参数、路径参数全覆盖
 - ✅ 可配置的HTML标签白名单
 - ✅ 恶意脚本自动清理
 
 #### 🔹 全局验证管道
+
 - ✅ 基于class-validator的强类型验证
 - ✅ 自动数据转换和清理
 - ✅ 详细的验证错误消息
 - ✅ 白名单模式防止额外属性
 
 #### 🔹 自定义验证器
+
 - ✅ 强密码验证器（IsStrongPassword）
   - 可配置的最小长度要求
   - 大小写字母要求
@@ -60,6 +68,7 @@
   - 详细的密码强度反馈
 
 #### 🔹 DTO 验证规则
+
 - ✅ 统一的DTO验证标准
 - ✅ API参数校验装饰器
 - ✅ 请求数据自动转换
@@ -67,24 +76,28 @@
 ### 3. **日志系统** ✅
 
 #### 🔹 Winston 日志框架
+
 - ✅ 结构化JSON日志格式
 - ✅ 多级别日志管理（error, warn, info, debug, verbose）
 - ✅ 开发环境友好的彩色日志
 - ✅ 生产环境日志文件管理
 
 #### 🔹 请求/响应日志
+
 - ✅ 详细的HTTP请求日志记录
 - ✅ 响应时间和状态码跟踪
 - ✅ 客户端IP和User-Agent记录
 - ✅ 错误级别自动分类
 
 #### 🔹 错误日志追踪
+
 - ✅ 异常自动捕获和记录
 - ✅ 堆栈跟踪信息保留
 - ✅ 拒绝处理器配置
 - ✅ 日志文件轮转管理
 
 #### 🔹 日志轮转和压缩
+
 - ✅ 按大小自动轮转（5MB）
 - ✅ 保留历史日志文件
 - ✅ 分类日志文件管理
@@ -115,6 +128,7 @@ src/
 ### 🔧 **核心组件**
 
 #### **SecurityMiddleware**
+
 ```typescript
 // 功能：IP过滤、请求日志、安全头设置
 @Injectable()
@@ -126,6 +140,7 @@ export class SecurityMiddleware implements NestMiddleware {
 ```
 
 #### **XssFilterInterceptor**
+
 ```typescript
 // 功能：XSS攻击防护
 @Injectable()
@@ -137,10 +152,12 @@ export class XssFilterInterceptor implements NestInterceptor {
 ```
 
 #### **IsStrongPasswordConstraint**
+
 ```typescript
 // 功能：密码强度验证
 @Injectable()
-export class IsStrongPasswordConstraint implements ValidatorConstraintInterface {
+export class IsStrongPasswordConstraint
+  implements ValidatorConstraintInterface {
   // 密码复杂度检查
   // 可配置的安全策略
   // 详细的错误反馈
@@ -289,7 +306,7 @@ curl -I http://localhost:3000/health
 // 自定义密码验证器
 export class CustomPasswordValidator {
   @IsStrongPassword({
-    message: '密码必须包含大小写字母、数字和特殊字符'
+    message: '密码必须包含大小写字母、数字和特殊字符',
   })
   password: string;
 }
@@ -307,28 +324,32 @@ export class SensitiveController {
 ### **生产环境配置**
 
 1. **环境变量安全**
+
    ```bash
    # 使用强密码
    JWT_SECRET=<64位随机字符串>
-   
+
    # 禁用开发功能
    NODE_ENV=production
    DB_SYNCHRONIZE=false
-   
+
    # 配置CORS白名单
    CORS_ORIGIN=https://yourdomain.com
    ```
 
 2. **HTTPS强制**
+
    ```typescript
    // 生产环境强制HTTPS
-   app.use(helmet({
-     hsts: {
-       maxAge: 31536000,
-       includeSubDomains: true,
-       preload: true
-     }
-   }));
+   app.use(
+     helmet({
+       hsts: {
+         maxAge: 31536000,
+         includeSubDomains: true,
+         preload: true,
+       },
+     }),
+   );
    ```
 
 3. **定期安全审计**
@@ -339,14 +360,14 @@ export class SensitiveController {
 
 ### **常见安全威胁防护**
 
-| 威胁类型 | 防护措施 | 实施状态 |
-|----------|----------|----------|
-| XSS攻击 | 输入过滤、输出编码 | ✅ 已实施 |
-| CSRF攻击 | 安全头、Token验证 | ✅ 已实施 |
-| SQL注入 | 参数化查询、ORM | ✅ 已实施 |
-| DDoS攻击 | 限流、IP过滤 | ✅ 已实施 |
-| 点击劫持 | X-Frame-Options | ✅ 已实施 |
-| 暴力破解 | 限流、强密码 | ✅ 已实施 |
+| 威胁类型 | 防护措施           | 实施状态  |
+| -------- | ------------------ | --------- |
+| XSS攻击  | 输入过滤、输出编码 | ✅ 已实施 |
+| CSRF攻击 | 安全头、Token验证  | ✅ 已实施 |
+| SQL注入  | 参数化查询、ORM    | ✅ 已实施 |
+| DDoS攻击 | 限流、IP过滤       | ✅ 已实施 |
+| 点击劫持 | X-Frame-Options    | ✅ 已实施 |
+| 暴力破解 | 限流、强密码       | ✅ 已实施 |
 
 ## 🎯 性能优化
 
@@ -370,7 +391,7 @@ export class SensitiveController {
 ✅ **企业级日志系统** - 结构化日志、多级别管理、文件轮转  
 ✅ **灵活的配置管理** - 所有安全策略支持环境变量配置  
 ✅ **高性能中间件** - 优化的执行顺序和缓存机制  
-✅ **完善的文档支持** - Swagger集成、使用指南、安全最佳实践  
+✅ **完善的文档支持** - Swagger集成、使用指南、安全最佳实践
 
 项目现在具备了生产级别的安全能力，可以有效防护常见的Web安全威胁！
 
@@ -378,4 +399,4 @@ export class SensitiveController {
 
 **实施完成时间**: 2025-07-27  
 **安全等级**: 🛡️ 企业级  
-**文档状态**: ✅ 完整 
+**文档状态**: ✅ 完整

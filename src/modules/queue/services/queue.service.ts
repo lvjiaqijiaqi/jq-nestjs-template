@@ -109,8 +109,10 @@ export class QueueService {
     try {
       const queue = this.getQueue(queueType);
       const job = await queue.add(jobName, data, options);
-      
-      this.logger.log(`Job added to ${queueType} queue: ${jobName} (ID: ${job.id})`);
+
+      this.logger.log(
+        `Job added to ${queueType} queue: ${jobName} (ID: ${job.id})`,
+      );
       return job;
     } catch (error) {
       this.logger.error(`Failed to add job to ${queueType} queue:`, error);
@@ -168,12 +170,18 @@ export class QueueService {
   /**
    * 获取作业
    */
-  async getJob(queueType: QueueType, jobId: string | number): Promise<Job | null> {
+  async getJob(
+    queueType: QueueType,
+    jobId: string | number,
+  ): Promise<Job | null> {
     try {
       const queue = this.getQueue(queueType);
       return await queue.getJob(jobId);
     } catch (error) {
-      this.logger.error(`Failed to get job ${jobId} from ${queueType} queue:`, error);
+      this.logger.error(
+        `Failed to get job ${jobId} from ${queueType} queue:`,
+        error,
+      );
       return null;
     }
   }
@@ -189,7 +197,10 @@ export class QueueService {
         this.logger.log(`Job ${jobId} removed from ${queueType} queue`);
       }
     } catch (error) {
-      this.logger.error(`Failed to remove job ${jobId} from ${queueType} queue:`, error);
+      this.logger.error(
+        `Failed to remove job ${jobId} from ${queueType} queue:`,
+        error,
+      );
       throw error;
     }
   }
@@ -205,7 +216,10 @@ export class QueueService {
         this.logger.log(`Job ${jobId} retried in ${queueType} queue`);
       }
     } catch (error) {
-      this.logger.error(`Failed to retry job ${jobId} in ${queueType} queue:`, error);
+      this.logger.error(
+        `Failed to retry job ${jobId} in ${queueType} queue:`,
+        error,
+      );
       throw error;
     }
   }
@@ -253,8 +267,8 @@ export class QueueService {
     try {
       const queue = this.getQueue(queueType);
       const jobs = await queue.getJobs(status, start, end);
-      
-      return jobs.map(job => ({
+
+      return jobs.map((job) => ({
         id: job.id,
         name: job.name,
         data: job.data,
@@ -327,11 +341,16 @@ export class QueueService {
     try {
       const queue = this.getQueue(queueType);
       const cleaned = await queue.clean(grace, type, limit);
-      
-      this.logger.log(`Cleaned ${cleaned.length} ${type} jobs from ${queueType} queue`);
+
+      this.logger.log(
+        `Cleaned ${cleaned.length} ${type} jobs from ${queueType} queue`,
+      );
       return cleaned.length;
     } catch (error) {
-      this.logger.error(`Failed to cleanup ${type} jobs from ${queueType} queue:`, error);
+      this.logger.error(
+        `Failed to cleanup ${type} jobs from ${queueType} queue:`,
+        error,
+      );
       throw error;
     }
   }
@@ -341,7 +360,7 @@ export class QueueService {
    */
   async getAllQueueStats(): Promise<Record<QueueType, QueueStats>> {
     const stats: Record<QueueType, QueueStats> = {} as any;
-    
+
     for (const queueType of Object.values(QueueType)) {
       try {
         stats[queueType] = await this.getQueueStats(queueType);
@@ -357,7 +376,7 @@ export class QueueService {
         };
       }
     }
-    
+
     return stats;
   }
 
@@ -374,13 +393,13 @@ export class QueueService {
 
     try {
       const stats = await this.getQueueStats(queueType);
-      
+
       // 检查是否有太多失败的作业
       if (stats.failed > 50) {
         errors.push(`Too many failed jobs: ${stats.failed}`);
         status = 'unhealthy';
       }
-      
+
       // 检查是否有太多等待的作业
       if (stats.waiting > 1000) {
         errors.push(`Too many waiting jobs: ${stats.waiting}`);
@@ -391,9 +410,16 @@ export class QueueService {
     } catch (error) {
       return {
         status: 'unhealthy',
-        stats: { waiting: 0, active: 0, completed: 0, failed: 0, delayed: 0, paused: 0 },
+        stats: {
+          waiting: 0,
+          active: 0,
+          completed: 0,
+          failed: 0,
+          delayed: 0,
+          paused: 0,
+        },
         errors: [`Queue error: ${error.message}`],
       };
     }
   }
-} 
+}

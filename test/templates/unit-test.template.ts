@@ -12,12 +12,12 @@ import { Repository } from 'typeorm';
 
 /**
  * 单元测试模板
- * 
+ *
  * 使用方法：
  * 1. 复制此模板到要测试的模块目录
  * 2. 替换 YourService、YourEntity 等占位符
  * 3. 根据实际需要编写测试用例
- * 
+ *
  * 测试覆盖点：
  * - 服务方法的正常流程
  * - 异常情况处理
@@ -68,13 +68,10 @@ describe('YourService', () => {
       // Arrange
       // const createDto = YourEntityFactory.buildCreateData();
       // const expectedEntity = YourEntityFactory.build(createDto);
-      
       // (repository.create as jest.Mock).mockReturnValue(expectedEntity);
       // (repository.save as jest.Mock).mockResolvedValue(expectedEntity);
-
       // Act
       // const result = await service.create(createDto);
-
       // Assert
       // expect(repository.create).toHaveBeenCalledWith(createDto);
       // expect(repository.save).toHaveBeenCalledWith(expectedEntity);
@@ -85,9 +82,7 @@ describe('YourService', () => {
       // Arrange
       // const createDto = YourEntityFactory.buildCreateData();
       // const error = new Error('Database error');
-      
       // (repository.save as jest.Mock).mockRejectedValue(error);
-
       // Act & Assert
       // await expect(service.create(createDto)).rejects.toThrow('Database error');
     });
@@ -98,12 +93,9 @@ describe('YourService', () => {
       // Arrange
       // const id = '1';
       // const expectedEntity = YourEntityFactory.build({ id });
-      
       // (repository.findOne as jest.Mock).mockResolvedValue(expectedEntity);
-
       // Act
       // const result = await service.findById(id);
-
       // Assert
       // expect(repository.findOne).toHaveBeenCalledWith({ where: { id } });
       // expect(result).toEqual(expectedEntity);
@@ -112,12 +104,9 @@ describe('YourService', () => {
     it('should return null when entity not found', async () => {
       // Arrange
       // const id = 'non-existent-id';
-      
       // (repository.findOne as jest.Mock).mockResolvedValue(null);
-
       // Act
       // const result = await service.findById(id);
-
       // Assert
       // expect(repository.findOne).toHaveBeenCalledWith({ where: { id } });
       // expect(result).toBeNull();
@@ -131,13 +120,10 @@ describe('YourService', () => {
       // const updateDto = YourEntityFactory.buildUpdateData();
       // const existingEntity = YourEntityFactory.build({ id });
       // const updatedEntity = { ...existingEntity, ...updateDto };
-      
       // (repository.findOne as jest.Mock).mockResolvedValue(existingEntity);
       // (repository.save as jest.Mock).mockResolvedValue(updatedEntity);
-
       // Act
       // const result = await service.update(id, updateDto);
-
       // Assert
       // expect(repository.findOne).toHaveBeenCalledWith({ where: { id } });
       // expect(repository.save).toHaveBeenCalledWith(updatedEntity);
@@ -148,9 +134,7 @@ describe('YourService', () => {
       // Arrange
       // const id = 'non-existent-id';
       // const updateDto = YourEntityFactory.buildUpdateData();
-      
       // (repository.findOne as jest.Mock).mockResolvedValue(null);
-
       // Act & Assert
       // await expect(service.update(id, updateDto)).rejects.toThrow('Entity not found');
     });
@@ -161,13 +145,10 @@ describe('YourService', () => {
       // Arrange
       // const id = '1';
       // const existingEntity = YourEntityFactory.build({ id });
-      
       // (repository.findOne as jest.Mock).mockResolvedValue(existingEntity);
       // (repository.delete as jest.Mock).mockResolvedValue({ affected: 1 });
-
       // Act
       // const result = await service.remove(id);
-
       // Assert
       // expect(repository.findOne).toHaveBeenCalledWith({ where: { id } });
       // expect(repository.delete).toHaveBeenCalledWith(id);
@@ -177,9 +158,7 @@ describe('YourService', () => {
     it('should throw error when entity not found', async () => {
       // Arrange
       // const id = 'non-existent-id';
-      
       // (repository.findOne as jest.Mock).mockResolvedValue(null);
-
       // Act & Assert
       // await expect(service.remove(id)).rejects.toThrow('Entity not found');
     });
@@ -191,13 +170,10 @@ describe('YourService', () => {
       // const query = { page: 1, pageSize: 10 };
       // const entities = YourEntityFactory.buildList(5);
       // const total = 5;
-      
       // (repository.find as jest.Mock).mockResolvedValue(entities);
       // (repository.count as jest.Mock).mockResolvedValue(total);
-
       // Act
       // const result = await service.findMany(query);
-
       // Assert
       // expect(repository.find).toHaveBeenCalledWith({
       //   skip: 0,
@@ -217,13 +193,10 @@ describe('YourService', () => {
     it('should handle empty results', async () => {
       // Arrange
       // const query = { page: 1, pageSize: 10 };
-      
       // (repository.find as jest.Mock).mockResolvedValue([]);
       // (repository.count as jest.Mock).mockResolvedValue(0);
-
       // Act
       // const result = await service.findMany(query);
-
       // Assert
       // expect(result.items).toEqual([]);
       // expect(result.total).toBe(0);
@@ -237,4 +210,4 @@ describe('YourService', () => {
   // - 权限检查测试
   // - 缓存逻辑测试
   // - 错误处理测试
-}); 
+});

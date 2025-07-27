@@ -11,7 +11,10 @@ export default registerAs('security', () => ({
   // 请求体大小限制
   bodyParser: {
     limit: process.env.BODY_PARSER_LIMIT || '10mb',
-    parameterLimit: parseInt(process.env.BODY_PARSER_PARAMETER_LIMIT || '1000', 10),
+    parameterLimit: parseInt(
+      process.env.BODY_PARSER_PARAMETER_LIMIT || '1000',
+      10,
+    ),
   },
 
   // Helmet 安全头配置
@@ -31,8 +34,12 @@ export default registerAs('security', () => ({
 
   // IP 白名单/黑名单
   ipFilter: {
-    whitelist: process.env.IP_WHITELIST ? process.env.IP_WHITELIST.split(',') : [],
-    blacklist: process.env.IP_BLACKLIST ? process.env.IP_BLACKLIST.split(',') : [],
+    whitelist: process.env.IP_WHITELIST
+      ? process.env.IP_WHITELIST.split(',')
+      : [],
+    blacklist: process.env.IP_BLACKLIST
+      ? process.env.IP_BLACKLIST.split(',')
+      : [],
     trustProxy: true,
   },
 
@@ -47,7 +54,10 @@ export default registerAs('security', () => ({
 
   // 会话安全
   session: {
-    maxConcurrentSessions: parseInt(process.env.MAX_CONCURRENT_SESSIONS || '5', 10),
+    maxConcurrentSessions: parseInt(
+      process.env.MAX_CONCURRENT_SESSIONS || '5',
+      10,
+    ),
     sessionTimeout: parseInt(process.env.SESSION_TIMEOUT || '3600', 10), // 秒
   },
-})); 
+}));

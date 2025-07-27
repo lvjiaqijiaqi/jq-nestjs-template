@@ -7,8 +7,10 @@ config({ path: join(__dirname, '../.env.test') });
 
 // 设置测试环境变量
 process.env.NODE_ENV = 'test';
-process.env.JWT_SECRET = 'test-jwt-secret-key-for-testing-purposes-only-32-chars';
-process.env.JWT_REFRESH_SECRET = 'test-jwt-refresh-secret-key-for-testing-purposes-only-32-chars';
+process.env.JWT_SECRET =
+  'test-jwt-secret-key-for-testing-purposes-only-32-chars';
+process.env.JWT_REFRESH_SECRET =
+  'test-jwt-refresh-secret-key-for-testing-purposes-only-32-chars';
 process.env.DB_HOST = process.env.TEST_DB_HOST || 'localhost';
 process.env.DB_PORT = process.env.TEST_DB_PORT || '3306';
 process.env.DB_USERNAME = process.env.TEST_DB_USERNAME || 'root';
@@ -41,7 +43,8 @@ expect.extend({
   },
 
   toBeUuid(received: any) {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     const isUuid = typeof received === 'string' && uuidRegex.test(received);
     return {
       message: () => `expected ${received} to be a valid UUID`,
@@ -59,16 +62,17 @@ expect.extend({
   },
 
   toHaveValidStructure(received: any) {
-    const hasStructure = 
+    const hasStructure =
       received &&
       typeof received === 'object' &&
       'code' in received &&
       'message' in received &&
       'data' in received &&
       'timestamp' in received;
-    
+
     return {
-      message: () => `expected ${JSON.stringify(received)} to have valid API response structure`,
+      message: () =>
+        `expected ${JSON.stringify(received)} to have valid API response structure`,
       pass: hasStructure,
     };
   },
@@ -78,7 +82,7 @@ expect.extend({
 beforeAll(async () => {
   // 设置测试超时
   jest.setTimeout(30000);
-  
+
   // 静默控制台输出（可选）
   if (process.env.SILENT_TESTS === 'true') {
     console.log = jest.fn();
@@ -89,14 +93,14 @@ beforeAll(async () => {
 
 afterAll(async () => {
   // 清理资源
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 500));
 });
 
 // 每个测试前的设置
 beforeEach(() => {
   // 清除所有mock
   jest.clearAllMocks();
-  
+
   // 重置时间
   jest.useRealTimers();
 });
@@ -104,4 +108,4 @@ beforeEach(() => {
 afterEach(() => {
   // 恢复所有mock
   jest.restoreAllMocks();
-}); 
+});

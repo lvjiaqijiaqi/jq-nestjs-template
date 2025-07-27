@@ -25,5 +25,7 @@
       "@/shared/*": ["src/shared/*"],
       "@/utils/*": ["src/utils/*"]
     }
-  }
+  },
+  "include": ["src/**/*", "test/**/*", "*.ts", "*.js"],
+  "exclude": ["node_modules", "dist", "coverage"]
 }

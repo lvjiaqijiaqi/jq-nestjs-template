@@ -45,13 +45,17 @@ export class CacheHealthService {
 
       // 测试写入
       await this.cacheService.set(testKey, testValue, { ttl: 10 });
-      
+
       // 测试读取
       const readStartTime = Date.now();
       const result = await this.cacheService.get(testKey);
       latency = Date.now() - readStartTime;
 
-      if (result && typeof result === 'object' && (result as any).test === true) {
+      if (
+        result &&
+        typeof result === 'object' &&
+        (result as any).test === true
+      ) {
         isConnected = true;
       } else {
         errors.push('Cache read/write test failed');
@@ -59,7 +63,6 @@ export class CacheHealthService {
 
       // 清理测试键
       await this.cacheService.del(testKey);
-
     } catch (error) {
       errors.push(`Cache operation failed: ${error.message}`);
       latency = Date.now() - startTime;
@@ -70,10 +73,11 @@ export class CacheHealthService {
 
     // 确定健康状态
     let status: 'healthy' | 'unhealthy' | 'degraded' = 'healthy';
-    
+
     if (!isConnected) {
       status = 'unhealthy';
-    } else if (errors.length > 0 || latency > 1000) { // 延迟超过1秒认为是降级
+    } else if (errors.length > 0 || latency > 1000) {
+      // 延迟超过1秒认为是降级
       status = 'degraded';
     }
 
@@ -117,7 +121,7 @@ export class CacheHealthService {
     memoryUsage: number;
   }> {
     const stats = this.cacheService.getStats();
-    
+
     return {
       hitRate: stats.hitRate,
       averageLatency: stats.averageResponseTime,
@@ -156,21 +160,23 @@ export class CacheHealthService {
    */
   async warmupCache(): Promise<void> {
     const preloadConfig = this.configService.get('cache.performance.preload');
-    
+
     if (!preloadConfig.enabled || !preloadConfig.keys.length) {
       this.logger.debug('Cache preload disabled or no keys configured');
       return;
     }
 
-    this.logger.log(`Starting cache warmup for ${preloadConfig.keys.length} keys`);
-    
+    this.logger.log(
+      `Starting cache warmup for ${preloadConfig.keys.length} keys`,
+    );
+
     try {
       for (const key of preloadConfig.keys) {
         // 这里可以根据key的类型预加载不同的数据
         // 例如：预加载用户数据、权限数据等
         await this.preloadKey(key);
       }
-      
+
       this.logger.log('Cache warmup completed');
     } catch (error) {
       this.logger.error('Cache warmup failed:', error);
@@ -202,4 +208,4 @@ export class CacheHealthService {
       this.logger.warn(`Failed to preload cache key ${key}:`, error);
     }
   }
-} 
+}

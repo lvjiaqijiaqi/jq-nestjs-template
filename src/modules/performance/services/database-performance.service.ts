@@ -87,19 +87,14 @@ export class DatabasePerformanceService {
    */
   async getPerformanceMetrics(): Promise<DatabasePerformanceMetrics> {
     try {
-      const [
-        connectionPool,
-        queryStats,
-        memoryUsage,
-        tableStats,
-        indexUsage,
-      ] = await Promise.all([
-        this.getConnectionPoolStats(),
-        this.getQueryStats(),
-        this.getMemoryUsage(),
-        this.getTableStats(),
-        this.getIndexUsage(),
-      ]);
+      const [connectionPool, queryStats, memoryUsage, tableStats, indexUsage] =
+        await Promise.all([
+          this.getConnectionPoolStats(),
+          this.getQueryStats(),
+          this.getMemoryUsage(),
+          this.getTableStats(),
+          this.getIndexUsage(),
+        ]);
 
       return {
         connectionPool,
@@ -124,7 +119,8 @@ export class DatabasePerformanceService {
       let status: 'healthy' | 'warning' | 'critical' = 'healthy';
 
       // 检查连接池状态
-      const poolUsage = metrics.connectionPool.active / metrics.connectionPool.total;
+      const poolUsage =
+        metrics.connectionPool.active / metrics.connectionPool.total;
       if (poolUsage > 0.9) {
         status = 'critical';
         recommendations.push('连接池使用率过高，建议增加连接池大小');
@@ -230,7 +226,7 @@ export class DatabasePerformanceService {
       }
 
       const recommendations: string[] = [];
-      
+
       // 分析并提供建议
       if (tableInfo.rowCount > 1000000) {
         recommendations.push('表数据量较大，考虑分区或归档历史数据');
@@ -259,11 +255,14 @@ export class DatabasePerformanceService {
   private async getConnectionPoolStats() {
     // 这里需要根据实际的数据库连接池实现来获取统计信息
     // TypeORM没有直接暴露连接池统计，这里返回模拟数据
-    const maxConnections = this.configService.get('database.extra.connectionLimit', 10);
-    
+    const maxConnections = this.configService.get(
+      'database.extra.connectionLimit',
+      10,
+    );
+
     return {
       active: 2, // 活跃连接数
-      idle: 3,   // 空闲连接数
+      idle: 3, // 空闲连接数
       total: maxConnections,
       waiting: 0, // 等待连接数
     };
@@ -274,16 +273,17 @@ export class DatabasePerformanceService {
    */
   private getQueryStats() {
     const totalQueries = this.queryStats.totalQueries;
-    const averageTime = totalQueries > 0 ? this.queryStats.totalTime / totalQueries : 0;
-    
+    const averageTime =
+      totalQueries > 0 ? this.queryStats.totalTime / totalQueries : 0;
+
     return {
       totalQueries,
       slowQueries: this.slowQueries.length,
       averageQueryTime: Math.round(averageTime),
       queryTimeDistribution: {
-        fast: Math.floor(totalQueries * 0.7),   // 假设70%是快查询
+        fast: Math.floor(totalQueries * 0.7), // 假设70%是快查询
         medium: Math.floor(totalQueries * 0.25), // 25%是中等查询
-        slow: Math.floor(totalQueries * 0.05),   // 5%是慢查询
+        slow: Math.floor(totalQueries * 0.05), // 5%是慢查询
       },
     };
   }
@@ -304,11 +304,11 @@ export class DatabasePerformanceService {
       }
 
       const result = await this.dataSource.query(query);
-      
+
       return {
         bufferPoolSize: 128 * 1024 * 1024, // 128MB 默认值
-        usedMemory: 64 * 1024 * 1024,      // 64MB 模拟值
-        freeMemory: 64 * 1024 * 1024,      // 64MB 模拟值
+        usedMemory: 64 * 1024 * 1024, // 64MB 模拟值
+        freeMemory: 64 * 1024 * 1024, // 64MB 模拟值
       };
     } catch (error) {
       this.logger.warn('Failed to get memory usage:', error);
@@ -357,7 +357,7 @@ export class DatabasePerformanceService {
       }
 
       const result = await this.dataSource.query(query);
-      
+
       return result.map((row: any) => ({
         tableName: row.tableName || row.table_name,
         rowCount: parseInt(row.rowCount || '0'),
@@ -396,18 +396,18 @@ export class DatabasePerformanceService {
     // 这里需要拦截TypeORM的查询执行
     // 由于TypeORM的限制，这里提供一个简化的实现
     const originalQuery = this.dataSource.query.bind(this.dataSource);
-    
+
     this.dataSource.query = async (query: string, parameters?: any[]) => {
       const startTime = Date.now();
-      
+
       try {
         const result = await originalQuery(query, parameters);
         const executionTime = Date.now() - startTime;
-        
+
         // 更新统计
         this.queryStats.totalQueries++;
         this.queryStats.totalTime += executionTime;
-        
+
         // 记录慢查询
         if (executionTime > this.queryStats.slowQueryThreshold) {
           this.slowQueries.push({
@@ -416,21 +416,26 @@ export class DatabasePerformanceService {
             timestamp: new Date(),
             parameters,
           });
-          
+
           // 保持慢查询列表大小
           if (this.slowQueries.length > 1000) {
             this.slowQueries = this.slowQueries.slice(-500);
           }
-          
-          this.logger.warn(`Slow query detected (${executionTime}ms): ${query.substring(0, 100)}...`);
+
+          this.logger.warn(
+            `Slow query detected (${executionTime}ms): ${query.substring(0, 100)}...`,
+          );
         }
-        
+
         return result;
       } catch (error) {
         const executionTime = Date.now() - startTime;
-        this.logger.error(`Query failed (${executionTime}ms): ${query.substring(0, 100)}...`, error);
+        this.logger.error(
+          `Query failed (${executionTime}ms): ${query.substring(0, 100)}...`,
+          error,
+        );
         throw error;
       }
     };
   }
-} 
+}

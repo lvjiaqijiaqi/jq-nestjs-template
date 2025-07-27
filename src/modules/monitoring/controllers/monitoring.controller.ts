@@ -1,7 +1,25 @@
-import { Controller, Get, Post, Delete, Param, Query, Res } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiParam } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Param,
+  Query,
+  Res,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+  ApiParam,
+} from '@nestjs/swagger';
 import { Response } from 'express';
-import { HealthCheckService, HealthStatus } from '../services/health-check.service';
+import {
+  HealthCheckService,
+  HealthStatus,
+} from '../services/health-check.service';
 import { MetricsService } from '../services/metrics.service';
 import { ErrorRateMiddleware } from '../middleware/metrics.middleware';
 import { ResponseDto } from '../../../common/dto/response.dto';
@@ -23,7 +41,8 @@ export class MonitoringController {
   @Public()
   @ApiOperation({
     summary: '获取系统健康状态',
-    description: '执行全面的系统健康检查，包括数据库、Redis、队列、内存、磁盘等各项检查',
+    description:
+      '执行全面的系统健康检查，包括数据库、Redis、队列、内存、磁盘等各项检查',
   })
   @ApiResponse({
     status: 200,
@@ -40,26 +59,52 @@ export class MonitoringController {
             version: '1.0.0',
             environment: 'development',
             checks: {
-              database: { status: 'healthy', message: 'Database responsive in 15ms', duration: 15 },
-              redis: { status: 'healthy', message: 'Redis responsive in 8ms', duration: 8 },
-              queue: { status: 'healthy', message: 'All queues healthy in 5ms', duration: 5 },
-              memory: { status: 'healthy', message: 'Memory usage: 45.2%', duration: 2 },
-              disk: { status: 'healthy', message: 'Disk usage: 32.1%', duration: 1 }
+              database: {
+                status: 'healthy',
+                message: 'Database responsive in 15ms',
+                duration: 15,
+              },
+              redis: {
+                status: 'healthy',
+                message: 'Redis responsive in 8ms',
+                duration: 8,
+              },
+              queue: {
+                status: 'healthy',
+                message: 'All queues healthy in 5ms',
+                duration: 5,
+              },
+              memory: {
+                status: 'healthy',
+                message: 'Memory usage: 45.2%',
+                duration: 2,
+              },
+              disk: {
+                status: 'healthy',
+                message: 'Disk usage: 32.1%',
+                duration: 1,
+              },
             },
-            summary: { total: 5, healthy: 5, degraded: 0, unhealthy: 0 }
-          }
-        }
-      }
-    }
+            summary: { total: 5, healthy: 5, degraded: 0, unhealthy: 0 },
+          },
+        },
+      },
+    },
   })
   async getHealthCheck(): Promise<ResponseDto> {
     try {
       const result = await this.healthCheckService.performHealthCheck();
       return ResponseDto.success(result, '健康检查完成');
     } catch (error) {
-      return ResponseDto.customError(500, '健康检查失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '健康检查失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -79,23 +124,36 @@ export class MonitoringController {
           message: '系统健康',
           data: {
             status: 'healthy',
-            message: '5/5 checks passing'
-          }
-        }
-      }
-    }
+            message: '5/5 checks passing',
+          },
+        },
+      },
+    },
   })
   async getQuickHealthCheck(): Promise<ResponseDto> {
     try {
       const result = await this.healthCheckService.getQuickHealthCheck();
-      const statusCode = result.status === HealthStatus.HEALTHY ? 200 : 
-                        result.status === HealthStatus.DEGRADED ? 200 : 503;
-      
-      return ResponseDto.success(result, result.status === HealthStatus.HEALTHY ? '系统健康' : '系统状态异常');
+      const statusCode =
+        result.status === HealthStatus.HEALTHY
+          ? 200
+          : result.status === HealthStatus.DEGRADED
+            ? 200
+            : 503;
+
+      return ResponseDto.success(
+        result,
+        result.status === HealthStatus.HEALTHY ? '系统健康' : '系统状态异常',
+      );
     } catch (error) {
-      return ResponseDto.customError(503, '健康检查失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        503,
+        '健康检查失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -108,11 +166,20 @@ export class MonitoringController {
   async getLivenessProbe(): Promise<ResponseDto> {
     try {
       const result = await this.healthCheckService.getLivenessProbe();
-      return ResponseDto.success(result, result.alive ? '服务存活' : '服务不可用');
+      return ResponseDto.success(
+        result,
+        result.alive ? '服务存活' : '服务不可用',
+      );
     } catch (error) {
-      return ResponseDto.customError(503, '存活探针失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        503,
+        '存活探针失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -126,11 +193,20 @@ export class MonitoringController {
     try {
       const result = await this.healthCheckService.getReadinessProbe();
       const statusCode = result.ready ? 200 : 503;
-      return ResponseDto.success(result, result.ready ? '服务就绪' : '服务未就绪');
+      return ResponseDto.success(
+        result,
+        result.ready ? '服务就绪' : '服务未就绪',
+      );
     } catch (error) {
-      return ResponseDto.customError(503, '就绪探针失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        503,
+        '就绪探针失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -151,9 +227,9 @@ nestjs_http_requests_total{method="GET",route="/api/health",status_code="200"} 1
 
 # HELP nestjs_http_request_duration_seconds HTTP request duration in seconds
 # TYPE nestjs_http_request_duration_seconds histogram
-nestjs_http_request_duration_seconds_bucket{method="GET",route="/api/health",status_code="200",le="0.005"} 10`
-      }
-    }
+nestjs_http_request_duration_seconds_bucket{method="GET",route="/api/health",status_code="200",le="0.005"} 10`,
+      },
+    },
   })
   async getMetrics(@Res() res: Response) {
     try {
@@ -177,9 +253,15 @@ nestjs_http_request_duration_seconds_bucket{method="GET",route="/api/health",sta
       const summary = await this.metricsService.getMetricsSummary();
       return ResponseDto.success(summary, '指标摘要获取成功');
     } catch (error) {
-      return ResponseDto.customError(500, '获取指标摘要失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '获取指标摘要失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -195,9 +277,15 @@ nestjs_http_request_duration_seconds_bucket{method="GET",route="/api/health",sta
       this.metricsService.resetMetrics();
       return ResponseDto.success(null, '指标已重置');
     } catch (error) {
-      return ResponseDto.customError(500, '重置指标失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '重置指标失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -218,22 +306,29 @@ nestjs_http_request_duration_seconds_bucket{method="GET",route="/api/health",sta
     try {
       const stats = this.errorRateMiddleware.getErrorRateStats();
       const limitedStats = stats.slice(0, +limit);
-      
+
       return ResponseDto.success(
         {
           stats: limitedStats,
           summary: {
             totalRoutes: stats.length,
-            highErrorRateRoutes: stats.filter(s => s.errorRate > 0.05).length,
-            criticalErrorRateRoutes: stats.filter(s => s.errorRate > 0.1).length,
+            highErrorRateRoutes: stats.filter((s) => s.errorRate > 0.05).length,
+            criticalErrorRateRoutes: stats.filter((s) => s.errorRate > 0.1)
+              .length,
           },
         },
         '错误率统计获取成功',
       );
     } catch (error) {
-      return ResponseDto.customError(500, '获取错误率统计失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '获取错误率统计失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -248,7 +343,7 @@ nestjs_http_request_duration_seconds_bucket{method="GET",route="/api/health",sta
     try {
       const memUsage = process.memoryUsage();
       const cpuUsage = process.cpuUsage();
-      
+
       const systemInfo = {
         process: {
           pid: process.pid,
@@ -266,7 +361,9 @@ nestjs_http_request_duration_seconds_bucket{method="GET",route="/api/health",sta
           heapUsed: Math.round(memUsage.heapUsed / 1024 / 1024),
           heapTotal: Math.round(memUsage.heapTotal / 1024 / 1024),
           external: Math.round(memUsage.external / 1024 / 1024),
-          arrayBuffers: Math.round((memUsage as any).arrayBuffers / 1024 / 1024),
+          arrayBuffers: Math.round(
+            (memUsage as any).arrayBuffers / 1024 / 1024,
+          ),
         },
         cpu: {
           user: cpuUsage.user,
@@ -281,9 +378,15 @@ nestjs_http_request_duration_seconds_bucket{method="GET",route="/api/health",sta
 
       return ResponseDto.success(systemInfo, '系统信息获取成功');
     } catch (error) {
-      return ResponseDto.customError(500, '获取系统信息失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '获取系统信息失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -304,11 +407,17 @@ nestjs_http_request_duration_seconds_bucket{method="GET",route="/api/health",sta
     try {
       // 这里可以实现告警测试逻辑
       const alertTypes = ['health', 'memory', 'cpu', 'disk', 'error'];
-      
+
       if (!alertTypes.includes(type)) {
-        return ResponseDto.customError(400, '不支持的告警类型', undefined, undefined, {
-          supportedTypes: alertTypes,
-        });
+        return ResponseDto.customError(
+          400,
+          '不支持的告警类型',
+          undefined,
+          undefined,
+          {
+            supportedTypes: alertTypes,
+          },
+        );
       }
 
       // 模拟发送测试告警
@@ -325,9 +434,15 @@ nestjs_http_request_duration_seconds_bucket{method="GET",route="/api/health",sta
 
       return ResponseDto.success(testAlert, `${type}告警测试已触发`);
     } catch (error) {
-      return ResponseDto.customError(500, '告警测试失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '告警测试失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -344,7 +459,9 @@ nestjs_http_request_duration_seconds_bucket{method="GET",route="/api/health",sta
       const [healthResult, metricsSummary, errorRates] = await Promise.all([
         this.healthCheckService.getQuickHealthCheck(),
         this.metricsService.getMetricsSummary(),
-        Promise.resolve(this.errorRateMiddleware.getErrorRateStats().slice(0, 10)),
+        Promise.resolve(
+          this.errorRateMiddleware.getErrorRateStats().slice(0, 10),
+        ),
       ]);
 
       const memUsage = process.memoryUsage();
@@ -381,16 +498,23 @@ nestjs_http_request_duration_seconds_bucket{method="GET",route="/api/health",sta
           topRoutes: errorRates,
           summary: {
             totalRoutes: errorRates.length,
-            highErrorRoutes: errorRates.filter(r => r.errorRate > 0.05).length,
+            highErrorRoutes: errorRates.filter((r) => r.errorRate > 0.05)
+              .length,
           },
         },
       };
 
       return ResponseDto.success(dashboardData, '仪表板数据获取成功');
     } catch (error) {
-      return ResponseDto.customError(500, '获取仪表板数据失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '获取仪表板数据失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
-} 
+}

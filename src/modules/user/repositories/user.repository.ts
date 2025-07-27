@@ -20,8 +20,12 @@ export class UserRepository extends BaseRepository<User> {
    * @param email 邮箱地址
    * @param includePassword 是否包含密码字段
    */
-  async findByEmail(email: string, includePassword = false): Promise<User | null> {
-    const queryBuilder = this.userRepository.createQueryBuilder('user')
+  async findByEmail(
+    email: string,
+    includePassword = false,
+  ): Promise<User | null> {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
       .where('user.email = :email', { email });
 
     if (includePassword) {
@@ -36,8 +40,12 @@ export class UserRepository extends BaseRepository<User> {
    * @param username 用户名
    * @param includePassword 是否包含密码字段
    */
-  async findByUsername(username: string, includePassword = false): Promise<User | null> {
-    const queryBuilder = this.userRepository.createQueryBuilder('user')
+  async findByUsername(
+    username: string,
+    includePassword = false,
+  ): Promise<User | null> {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
       .where('user.username = :username', { username });
 
     if (includePassword) {
@@ -53,35 +61,51 @@ export class UserRepository extends BaseRepository<User> {
    * @param includePassword 是否包含密码字段
    */
   async findByEmailOrUsername(
-    emailOrUsername: string, 
-    includePassword = false
+    emailOrUsername: string,
+    includePassword = false,
   ): Promise<User | null> {
-    this.logger.debug(`🔍 UserRepository.findByEmailOrUsername 开始查询 - emailOrUsername: ${emailOrUsername}, includePassword: ${includePassword}`);
-    
+    this.logger.debug(
+      `🔍 UserRepository.findByEmailOrUsername 开始查询 - emailOrUsername: ${emailOrUsername}, includePassword: ${includePassword}`,
+    );
+
     try {
-      const queryBuilder = this.userRepository.createQueryBuilder('user')
-        .where('user.email = :emailOrUsername OR user.username = :emailOrUsername', { 
-          emailOrUsername 
-        });
+      const queryBuilder = this.userRepository
+        .createQueryBuilder('user')
+        .where(
+          'user.email = :emailOrUsername OR user.username = :emailOrUsername',
+          {
+            emailOrUsername,
+          },
+        );
 
       if (includePassword) {
         queryBuilder.addSelect('user.password');
       }
 
-      this.logger.debug(`📝 UserRepository.findByEmailOrUsername SQL查询: ${queryBuilder.getSql()}`);
-      this.logger.debug(`📝 UserRepository.findByEmailOrUsername 参数: ${JSON.stringify(queryBuilder.getParameters())}`);
+      this.logger.debug(
+        `📝 UserRepository.findByEmailOrUsername SQL查询: ${queryBuilder.getSql()}`,
+      );
+      this.logger.debug(
+        `📝 UserRepository.findByEmailOrUsername 参数: ${JSON.stringify(queryBuilder.getParameters())}`,
+      );
 
       const result = await queryBuilder.getOne();
-      
+
       if (result) {
-        this.logger.log(`✅ UserRepository.findByEmailOrUsername 找到用户 - userId: ${result.id}, username: ${result.username}, email: ${result.email}`);
+        this.logger.log(
+          `✅ UserRepository.findByEmailOrUsername 找到用户 - userId: ${result.id}, username: ${result.username}, email: ${result.email}`,
+        );
       } else {
-        this.logger.warn(`❌ UserRepository.findByEmailOrUsername 未找到用户 - emailOrUsername: ${emailOrUsername}`);
+        this.logger.warn(
+          `❌ UserRepository.findByEmailOrUsername 未找到用户 - emailOrUsername: ${emailOrUsername}`,
+        );
       }
-      
+
       return result;
     } catch (error) {
-      this.logger.error(`💥 UserRepository.findByEmailOrUsername 查询异常 - emailOrUsername: ${emailOrUsername}, error: ${error.message}`);
+      this.logger.error(
+        `💥 UserRepository.findByEmailOrUsername 查询异常 - emailOrUsername: ${emailOrUsername}, error: ${error.message}`,
+      );
       throw error;
     }
   }
@@ -92,7 +116,8 @@ export class UserRepository extends BaseRepository<User> {
    * @param excludeUserId 排除的用户ID（用于更新时检查）
    */
   async isEmailExists(email: string, excludeUserId?: string): Promise<boolean> {
-    const queryBuilder = this.userRepository.createQueryBuilder('user')
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
       .where('user.email = :email', { email });
 
     if (excludeUserId) {
@@ -108,8 +133,12 @@ export class UserRepository extends BaseRepository<User> {
    * @param username 用户名
    * @param excludeUserId 排除的用户ID（用于更新时检查）
    */
-  async isUsernameExists(username: string, excludeUserId?: string): Promise<boolean> {
-    const queryBuilder = this.userRepository.createQueryBuilder('user')
+  async isUsernameExists(
+    username: string,
+    excludeUserId?: string,
+  ): Promise<boolean> {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
       .where('user.username = :username', { username });
 
     if (excludeUserId) {
@@ -126,7 +155,8 @@ export class UserRepository extends BaseRepository<User> {
    * @param limit 限制数量
    */
   async findByStatus(status: UserStatus, limit?: number): Promise<User[]> {
-    const queryBuilder = this.userRepository.createQueryBuilder('user')
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
       .where('user.status = :status', { status });
 
     if (limit) {
@@ -142,7 +172,8 @@ export class UserRepository extends BaseRepository<User> {
    * @param limit 限制数量
    */
   async findByRoleName(roleName: string, limit?: number): Promise<User[]> {
-    const queryBuilder = this.userRepository.createQueryBuilder('user')
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
       .leftJoinAndSelect('user.role', 'role')
       .where('role.name = :roleName', { roleName });
 
@@ -191,12 +222,16 @@ export class UserRepository extends BaseRepository<User> {
    * @param limit 限制数量
    */
   async searchUsers(keyword: string, limit = 20): Promise<User[]> {
-    return await this.userRepository.createQueryBuilder('user')
-      .where('user.username LIKE :keyword OR user.email LIKE :keyword OR user.nickname LIKE :keyword', {
-        keyword: `%${keyword}%`
-      })
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .where(
+        'user.username LIKE :keyword OR user.email LIKE :keyword OR user.nickname LIKE :keyword',
+        {
+          keyword: `%${keyword}%`,
+        },
+      )
       .andWhere('user.status = :status', { status: UserStatus.ACTIVE })
       .limit(limit)
       .getMany();
   }
-} 
+}

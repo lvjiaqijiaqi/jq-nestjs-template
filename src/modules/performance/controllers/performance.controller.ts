@@ -1,8 +1,21 @@
 import { Controller, Get, Query, Param, Delete } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+  ApiParam,
+} from '@nestjs/swagger';
 import { DatabasePerformanceService } from '../services/database-performance.service';
-import { CacheService, CacheStrategy } from '../../cache/services/cache.service';
-import { ResponseDto, PaginatedResponseDto } from '../../../common/dto/response.dto';
+import {
+  CacheService,
+  CacheStrategy,
+} from '../../cache/services/cache.service';
+import {
+  ResponseDto,
+  PaginatedResponseDto,
+} from '../../../common/dto/response.dto';
 import { RequirePermissions } from '../../auth/decorators/auth.decorators';
 import { ApiVersion } from '../../../common/decorators/api-version.decorator';
 import { API_RESPONSE_EXAMPLES } from '../../../config/swagger.config';
@@ -35,19 +48,23 @@ export class PerformanceController {
             database: {
               status: 'healthy',
               connectionPool: { active: 2, idle: 3, total: 10 },
-              queryStats: { totalQueries: 1000, slowQueries: 5, averageQueryTime: 45 }
+              queryStats: {
+                totalQueries: 1000,
+                slowQueries: 5,
+                averageQueryTime: 45,
+              },
             },
             cache: {
               status: 'healthy',
               hitRate: 85.5,
               totalOperations: 5000,
-              averageLatency: 2.5
+              averageLatency: 2.5,
             },
-            recommendations: ['优化慢查询', '增加缓存使用']
-          }
-        }
-      }
-    }
+            recommendations: ['优化慢查询', '增加缓存使用'],
+          },
+        },
+      },
+    },
   })
   async getPerformanceOverview(): Promise<ResponseDto> {
     try {
@@ -81,9 +98,15 @@ export class PerformanceController {
 
       return ResponseDto.success(overview, '获取性能概览成功');
     } catch (error) {
-      return ResponseDto.customError(500, '获取性能概览失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '获取性能概览失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -95,12 +118,19 @@ export class PerformanceController {
   })
   async getDatabaseMetrics(): Promise<ResponseDto> {
     try {
-      const metrics = await this.databasePerformanceService.getPerformanceMetrics();
+      const metrics =
+        await this.databasePerformanceService.getPerformanceMetrics();
       return ResponseDto.success(metrics, '获取数据库性能指标成功');
     } catch (error) {
-      return ResponseDto.customError(500, '获取数据库性能指标失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '获取数据库性能指标失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -115,9 +145,15 @@ export class PerformanceController {
       const health = await this.databasePerformanceService.getHealthStatus();
       return ResponseDto.success(health, '获取数据库健康状态成功');
     } catch (error) {
-      return ResponseDto.customError(500, '获取数据库健康状态失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '获取数据库健康状态失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -133,16 +169,20 @@ export class PerformanceController {
     description: '返回数量限制',
     example: 50,
   })
-  async getSlowQueries(
-    @Query('limit') limit = 50,
-  ): Promise<ResponseDto> {
+  async getSlowQueries(@Query('limit') limit = 50): Promise<ResponseDto> {
     try {
       const slowQueries = this.databasePerformanceService.getSlowQueries(limit);
       return ResponseDto.success(slowQueries, '获取慢查询列表成功');
     } catch (error) {
-      return ResponseDto.customError(500, '获取慢查询列表失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '获取慢查询列表失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -157,9 +197,15 @@ export class PerformanceController {
       this.databasePerformanceService.clearSlowQueries();
       return ResponseDto.success(null, '慢查询记录已清除');
     } catch (error) {
-      return ResponseDto.customError(500, '清除慢查询记录失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '清除慢查询记录失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -184,9 +230,15 @@ export class PerformanceController {
 
       return ResponseDto.success(cacheMetrics, '获取缓存性能指标成功');
     } catch (error) {
-      return ResponseDto.customError(500, '获取缓存性能指标失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '获取缓存性能指标失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -201,9 +253,15 @@ export class PerformanceController {
       await this.cacheService.clear();
       return ResponseDto.success(null, '所有缓存已清除');
     } catch (error) {
-      return ResponseDto.customError(500, '清除缓存失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '清除缓存失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -226,9 +284,15 @@ export class PerformanceController {
       await this.cacheService.clearByStrategy(strategy);
       return ResponseDto.success(null, `${strategy} 策略缓存已清除`);
     } catch (error) {
-      return ResponseDto.customError(500, '清除策略缓存失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '清除策略缓存失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -261,9 +325,15 @@ export class PerformanceController {
 
       return ResponseDto.success(systemMetrics, '获取系统性能指标成功');
     } catch (error) {
-      return ResponseDto.customError(500, '获取系统性能指标失败', undefined, undefined, {
-        error: error.message,
-      });
+      return ResponseDto.customError(
+        500,
+        '获取系统性能指标失败',
+        undefined,
+        undefined,
+        {
+          error: error.message,
+        },
+      );
     }
   }
 
@@ -274,14 +344,14 @@ export class PerformanceController {
     try {
       const testKey = 'health-check-test';
       const testValue = { test: true, timestamp: Date.now() };
-      
+
       await this.cacheService.set(testKey, testValue, { ttl: 10 });
       const result = await this.cacheService.get(testKey);
       await this.cacheService.del(testKey);
-      
+
       return result !== null;
     } catch (error) {
       return false;
     }
   }
-} 
+}

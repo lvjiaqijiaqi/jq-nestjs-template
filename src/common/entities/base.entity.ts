@@ -60,4 +60,4 @@ export abstract class BaseEntity extends TypeOrmBaseEntity {
     default: 1,
   })
   version: number;
-} 
+}

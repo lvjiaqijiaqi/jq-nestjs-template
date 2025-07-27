@@ -53,7 +53,8 @@ import { QueueController } from './controllers/queue.controller';
         useFactory: async (configService: ConfigService) => {
           const queueConfig = configService.get('queue');
           return {
-            defaultJobOptions: queueConfig.queues.notification.defaultJobOptions,
+            defaultJobOptions:
+              queueConfig.queues.notification.defaultJobOptions,
           };
         },
         inject: [ConfigService],
@@ -83,11 +84,7 @@ import { QueueController } from './controllers/queue.controller';
     ),
   ],
   controllers: [QueueController],
-  providers: [
-    QueueService,
-    EmailProcessor,
-    FileProcessor,
-  ],
+  providers: [QueueService, EmailProcessor, FileProcessor],
   exports: [QueueService, BullModule],
 })
-export class QueueModule {} 
+export class QueueModule {}

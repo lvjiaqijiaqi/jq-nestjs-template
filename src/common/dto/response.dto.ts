@@ -14,13 +14,19 @@ export class ResponseDto<T = any> {
   @ApiPropertyOptional({ description: '响应数据' })
   data?: T;
 
-  @ApiProperty({ description: '响应时间戳', example: '2025-07-27T08:00:00.000Z' })
+  @ApiProperty({
+    description: '响应时间戳',
+    example: '2025-07-27T08:00:00.000Z',
+  })
   timestamp: string;
 
   @ApiPropertyOptional({ description: '请求路径', example: '/api/users' })
   path?: string;
 
-  @ApiPropertyOptional({ description: '请求ID，用于日志追踪', example: 'req_123456789' })
+  @ApiPropertyOptional({
+    description: '请求ID，用于日志追踪',
+    example: 'req_123456789',
+  })
   requestId?: string;
 
   constructor(
@@ -41,7 +47,12 @@ export class ResponseDto<T = any> {
   /**
    * 创建成功响应
    */
-  static success<T>(data?: T, message = '操作成功', path?: string, requestId?: string): ResponseDto<T> {
+  static success<T>(
+    data?: T,
+    message = '操作成功',
+    path?: string,
+    requestId?: string,
+  ): ResponseDto<T> {
     return new ResponseDto(200, message, data, path, requestId);
   }
 
@@ -54,7 +65,13 @@ export class ResponseDto<T = any> {
     path?: string,
     requestId?: string,
   ): ResponseDto<T> {
-    return new ResponseDto(errorCode.code, errorCode.message, data, path, requestId);
+    return new ResponseDto(
+      errorCode.code,
+      errorCode.message,
+      data,
+      path,
+      requestId,
+    );
   }
 
   /**
@@ -66,7 +83,13 @@ export class ResponseDto<T = any> {
     requestId?: string,
     data?: any,
   ): ResponseDto {
-    return new ResponseDto(errorCode.code, errorCode.message, data, path, requestId);
+    return new ResponseDto(
+      errorCode.code,
+      errorCode.message,
+      data,
+      path,
+      requestId,
+    );
   }
 
   /**
@@ -178,6 +201,12 @@ export class ListResponseDto<T> extends ResponseDto<T[]> {
     path?: string,
     requestId?: string,
   ): ListResponseDto<T> {
-    return new ListResponseDto(data, total ?? data.length, message, path, requestId);
+    return new ListResponseDto(
+      data,
+      total ?? data.length,
+      message,
+      path,
+      requestId,
+    );
   }
-} 
+}

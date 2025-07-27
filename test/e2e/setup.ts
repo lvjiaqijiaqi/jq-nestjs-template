@@ -17,16 +17,18 @@ beforeAll(async () => {
   }).compile();
 
   app = moduleFixture.createNestApplication();
-  
+
   // 应用全局管道和中间件
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   await app.init();
-  
+
   // 获取数据源
   dataSource = app.get<DataSource>(getDataSourceToken());
 });
@@ -56,16 +58,16 @@ async function cleanDatabase() {
   try {
     // 获取所有表名
     const entities = dataSource.entityMetadatas;
-    
+
     // 禁用外键约束检查
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 0');
-    
+
     // 清空所有表
     for (const entity of entities) {
       const repository = dataSource.getRepository(entity.name);
       await repository.clear();
     }
-    
+
     // 启用外键约束检查
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 1');
   } catch (error) {
@@ -74,4 +76,4 @@ async function cleanDatabase() {
 }
 
 // 导出应用实例供测试使用
-export { app, dataSource }; 
+export { app, dataSource };

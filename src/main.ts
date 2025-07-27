@@ -3,7 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { createSwaggerConfig, swaggerOptions, swaggerUiOptions } from './config/swagger.config';
+import {
+  createSwaggerConfig,
+  swaggerOptions,
+  swaggerUiOptions,
+} from './config/swagger.config';
 
 // 正确导入helmet和compression
 const helmet = require('helmet');
@@ -14,7 +18,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
-  
+
   const configService = app.get(ConfigService);
   const logger = new Logger('Bootstrap');
 
@@ -30,7 +34,8 @@ async function bootstrap() {
   app.use('/api', (req, res, next) => {
     if (req.headers['content-length']) {
       const contentLength = parseInt(req.headers['content-length']);
-      const maxSize = parseInt(bodyParserConfig.limit.replace('mb', '')) * 1024 * 1024;
+      const maxSize =
+        parseInt(bodyParserConfig.limit.replace('mb', '')) * 1024 * 1024;
       if (contentLength > maxSize) {
         return res.status(413).json({
           code: 413,
@@ -76,20 +81,32 @@ async function bootstrap() {
       origin: nodeEnv === 'production' ? false : true, // 生产环境需要配置具体域名
       credentials: configService.get<boolean>('app.cors.credentials', true),
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-API-Version', 'X-Request-Id'],
+      allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'X-API-Version',
+        'X-Request-Id',
+      ],
     });
   }
 
   // Swagger 文档配置
   if (nodeEnv !== 'production') {
     const swaggerConfig = createSwaggerConfig();
-    const document = SwaggerModule.createDocument(app, swaggerConfig, swaggerOptions);
-    
+    const document = SwaggerModule.createDocument(
+      app,
+      swaggerConfig,
+      swaggerOptions,
+    );
+
     // 设置Swagger文档路径
     const docsPath = `${apiPrefix}/docs`;
     SwaggerModule.setup(docsPath, app, document, swaggerUiOptions);
 
-    logger.log(`📚 Swagger documentation: http://localhost:${port}/${docsPath}`);
+    logger.log(
+      `📚 Swagger documentation: http://localhost:${port}/${docsPath}`,
+    );
     logger.log(`📋 API 规范文档: http://localhost:${port}/${docsPath}-json`);
   }
 
@@ -99,9 +116,15 @@ async function bootstrap() {
   logger.log(`🚀 ${appName} is running on: http://localhost:${port}`);
   logger.log(`🌐 API 基础路径: http://localhost:${port}/${apiPrefix}`);
   logger.log(`📄 Environment: ${nodeEnv}`);
-  logger.log(`🛡️ Security features enabled: Helmet, CORS, Rate Limiting, Input Validation`);
-  logger.log(`📊 Logs enabled: HTTP requests, Database queries, Application events`);
-  logger.log(`🎯 Features: JWT Auth, RBAC, API Versioning, Unified Response, Error Codes`);
+  logger.log(
+    `🛡️ Security features enabled: Helmet, CORS, Rate Limiting, Input Validation`,
+  );
+  logger.log(
+    `📊 Logs enabled: HTTP requests, Database queries, Application events`,
+  );
+  logger.log(
+    `🎯 Features: JWT Auth, RBAC, API Versioning, Unified Response, Error Codes`,
+  );
 }
 
 bootstrap().catch((error) => {
