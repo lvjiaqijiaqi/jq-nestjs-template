@@ -83,6 +83,61 @@ export const validationSchema = Joi.object({
   CACHE_CLUSTER_ENABLED: Joi.string().valid('true', 'false').default('false'),
   CACHE_CLUSTER_NODES: Joi.string().allow('', null).optional(),
 
+  // 队列配置
+  REDIS_QUEUE_DB: Joi.number().default(2),
+  REDIS_QUEUE_PREFIX: Joi.string().default('bull:'),
+  
+  // 队列作业配置
+  QUEUE_REMOVE_ON_COMPLETE: Joi.number().default(100),
+  QUEUE_REMOVE_ON_FAIL: Joi.number().default(50),
+  
+  // 邮件队列配置
+  QUEUE_EMAIL_ATTEMPTS: Joi.number().default(3),
+  QUEUE_EMAIL_BACKOFF_DELAY: Joi.number().default(2000),
+  QUEUE_EMAIL_CONCURRENCY: Joi.number().default(5),
+  
+  // 文件队列配置
+  QUEUE_FILE_ATTEMPTS: Joi.number().default(2),
+  QUEUE_FILE_BACKOFF_DELAY: Joi.number().default(1000),
+  QUEUE_FILE_CONCURRENCY: Joi.number().default(3),
+  
+  // 通知队列配置
+  QUEUE_NOTIFICATION_ATTEMPTS: Joi.number().default(5),
+  QUEUE_NOTIFICATION_BACKOFF_DELAY: Joi.number().default(1000),
+  QUEUE_NOTIFICATION_CONCURRENCY: Joi.number().default(10),
+  
+  // 数据队列配置
+  QUEUE_DATA_ATTEMPTS: Joi.number().default(1),
+  QUEUE_DATA_CONCURRENCY: Joi.number().default(2),
+  
+  // 报表队列配置
+  QUEUE_REPORT_ATTEMPTS: Joi.number().default(2),
+  QUEUE_REPORT_BACKOFF_DELAY: Joi.number().default(5000),
+  QUEUE_REPORT_CONCURRENCY: Joi.number().default(1),
+  
+  // 队列监控配置
+  QUEUE_MONITORING_ENABLED: Joi.string().valid('true', 'false').default('false'),
+  QUEUE_MONITORING_PORT: Joi.number().default(3001),
+  QUEUE_MONITORING_PATH: Joi.string().default('/admin/queues'),
+  
+  // 队列清理配置
+  QUEUE_CLEANUP_ENABLED: Joi.string().valid('true', 'false').default('false'),
+  QUEUE_CLEANUP_INTERVAL: Joi.string().default('0 2 * * *'),
+  QUEUE_CLEANUP_RETAIN_DAYS: Joi.number().default(7),
+  
+  // 队列重试配置
+  QUEUE_MAX_ATTEMPTS: Joi.number().default(3),
+  QUEUE_BACKOFF_TYPE: Joi.string().valid('exponential', 'fixed').default('exponential'),
+  QUEUE_BACKOFF_DELAY: Joi.number().default(2000),
+  
+  // 队列全局配置
+  QUEUE_GLOBAL_REMOVE_ON_COMPLETE: Joi.number().default(100),
+  QUEUE_GLOBAL_REMOVE_ON_FAIL: Joi.number().default(50),
+  QUEUE_STALLED_INTERVAL: Joi.number().default(30000),
+  QUEUE_MAX_STALLED_COUNT: Joi.number().default(1),
+  QUEUE_RATE_LIMIT_MAX: Joi.number().default(100),
+  QUEUE_RATE_LIMIT_DURATION: Joi.number().default(60000),
+
   // 安全配置
   CORS_ENABLED: Joi.string().valid('true', 'false').default('true'),
   CORS_CREDENTIALS: Joi.string().valid('true', 'false').default('true'),

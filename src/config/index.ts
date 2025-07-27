@@ -5,6 +5,7 @@ import redisConfig from './redis.config';
 import securityConfig from './security.config';
 import loggerConfig from './logger.config';
 import cacheConfig from './cache.config';
+import queueConfig from './queue.config';
 
 export const configurations = [
   appConfig,
@@ -14,6 +15,7 @@ export const configurations = [
   securityConfig,
   loggerConfig,
   cacheConfig,
+  queueConfig,
 ];
 
 export { validationSchema } from './validation.schema';
