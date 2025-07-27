@@ -13,11 +13,31 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    
+    "test:unit": "jest --testPathPattern=\"src/.*\\.spec\\.ts$\" --testTimeout=30000",
+    "test:unit:watch": "jest --testPathPattern=\"src/.*\\.spec\\.ts$\" --watch",
+    "test:unit:cov": "jest --testPathPattern=\"src/.*\\.spec\\.ts$\" --coverage",
+    
+    "test:integration": "jest --testPathPattern=\"test/integration/.*\\.test\\.ts$\" --testTimeout=60000",
+    "test:integration:watch": "jest --testPathPattern=\"test/integration/.*\\.test\\.ts$\" --watch",
+    
+    "test:e2e:run": "jest --testPathPattern=\"test/e2e/.*\\.e2e-spec\\.ts$\" --testTimeout=120000 --runInBand",
+    "test:e2e:watch": "jest --testPathPattern=\"test/e2e/.*\\.e2e-spec\\.ts$\" --watch --runInBand",
+    
+    "test:all": "jest --testTimeout=60000 --detectOpenHandles --forceExit",
+    "test:all:cov": "jest --coverage --testTimeout=60000 --detectOpenHandles --forceExit",
+    
+    "test:ci": "jest --ci --coverage --testTimeout=60000 --detectOpenHandles --forceExit --passWithNoTests",
+    "test:clear": "jest --clearCache",
+    "test:setup": "./scripts/test.sh setup",
+    "test:clean": "./scripts/test.sh clean",
+    
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:generate": "npm run typeorm -- -d data-source.ts migration:generate",
     "migration:create": "npm run typeorm -- migration:create",
@@ -71,9 +91,10 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
+    "@faker-js/faker": "^9.9.0",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
-    "@nestjs/testing": "^11.0.1",
+    "@nestjs/testing": "^11.1.5",
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.10.7",
     "@types/bcryptjs": "^2.4.6",
@@ -83,37 +104,23 @@
     "@types/node": "^22.10.7",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
-    "@types/supertest": "^6.0.2",
+    "@types/supertest": "^6.0.3",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
     "globals": "^16.0.0",
     "jest": "^29.7.0",
+    "jest-extended": "^6.0.0",
+    "jest-mock-extended": "^4.0.0",
+    "nock": "^14.0.7",
     "prettier": "^3.4.2",
     "source-map-support": "^0.5.21",
-    "supertest": "^7.0.0",
+    "supertest": "^7.1.4",
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
   }
 }

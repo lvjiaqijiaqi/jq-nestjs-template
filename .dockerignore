@@ -1,0 +1,141 @@
+# Node.js
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 构建输出
+dist
+build
+coverage
+
+# 环境变量文件
+.env*
+!.env.example
+
+# 日志文件
+logs
+*.log
+
+# 运行时数据
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# 依赖目录
+lib-cov
+.nyc_output
+.grunt
+bower_components
+
+# 可选的npm缓存目录
+.npm
+
+# 可选的eslint缓存
+.eslintcache
+
+# 生产环境依赖缓存
+.node_repl_history
+
+# 输出和临时文件
+*.out
+*.swp
+*.swo
+*~
+
+# 编辑器文件
+.vscode
+.idea
+*.sublime-project
+*.sublime-workspace
+
+# OS生成的文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+.circleci
+
+# 测试相关
+test
+tests
+spec
+__tests__
+.jest-cache
+
+# 开发工具
+.nyc_output
+.storybook
+docs
+
+# 备份和临时文件
+backups
+tmp
+temp
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# 证书和密钥
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# 数据库文件
+*.sqlite
+*.db
+
+# 压缩文件
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# 监控和性能分析
+.cache
+*.tgz
+*.tar
+.cache
+.parcel-cache
+
+# README和文档
+README.md
+README.txt
+CHANGELOG.md
+LICENSE
+*.md
+*.txt
+!package.json
+
+# 脚本文件（生产环境不需要）
+scripts/test.sh
+scripts/dev.sh
+
+# 配置文件（开发用）
+config/development.env.template
+config/staging.env.template
+
+# Grafana和Prometheus配置
+config/grafana
+config/prometheus.yml 
