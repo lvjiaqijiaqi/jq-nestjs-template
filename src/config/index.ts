@@ -4,6 +4,7 @@ import jwtConfig from './jwt.config';
 import redisConfig from './redis.config';
 import securityConfig from './security.config';
 import loggerConfig from './logger.config';
+import cacheConfig from './cache.config';
 
 export const configurations = [
   appConfig,
@@ -12,6 +13,7 @@ export const configurations = [
   redisConfig,
   securityConfig,
   loggerConfig,
+  cacheConfig,
 ];
 
 export { validationSchema } from './validation.schema';

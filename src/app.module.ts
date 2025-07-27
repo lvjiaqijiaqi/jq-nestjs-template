@@ -7,14 +7,16 @@ import { DatabaseModule } from './shared/database.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { SecurityModule } from './modules/security/security.module';
 import { ApiDocsModule } from './modules/api-docs/api-docs.module';
+import { PerformanceModule } from './modules/performance/performance.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
     GlobalConfigModule,
     DatabaseModule,
-    SecurityModule, // 安全模块
-    ApiDocsModule,  // API文档模块
+    SecurityModule,      // 安全模块
+    ApiDocsModule,       // API文档模块
+    PerformanceModule,   // 性能优化模块
     AuthModule,
   ],
   controllers: [AppController],
