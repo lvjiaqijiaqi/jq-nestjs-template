@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
@@ -9,6 +9,8 @@ import { JwtPayload } from '../strategies/jwt.strategy';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
@@ -21,26 +23,45 @@ export class AuthService {
    * @param password 密码
    */
   async validateUser(account: string, password: string): Promise<any> {
-    const user = await this.userRepository.findByEmailOrUsername(account, true);
+    this.logger.debug(`🔍 AuthService.validateUser 开始验证 - account: ${account}`);
     
-    if (!user) {
-      return null;
-    }
+    try {
+      // 查找用户
+      this.logger.debug(`📋 AuthService.validateUser 查找用户 - account: ${account}`);
+      const user = await this.userRepository.findByEmailOrUsername(account, true);
+      
+      if (!user) {
+        this.logger.warn(`❌ AuthService.validateUser 用户不存在 - account: ${account}`);
+        return null;
+      }
 
-    // 检查用户状态
-    if (user.status !== UserStatus.ACTIVE) {
-      throw new UnauthorizedException('用户账号已被禁用');
-    }
+      this.logger.debug(`👤 AuthService.validateUser 找到用户 - userId: ${user.id}, username: ${user.username}, email: ${user.email}, status: ${user.status}`);
 
-    // 验证密码
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return null;
-    }
+      // 检查用户状态
+      if (user.status !== UserStatus.ACTIVE) {
+        this.logger.warn(`🚫 AuthService.validateUser 用户状态异常 - userId: ${user.id}, status: ${user.status}`);
+        throw new UnauthorizedException('用户账号已被禁用');
+      }
 
-    // 移除密码字段
-    const { password: _, ...result } = user;
-    return result;
+      // 验证密码
+      this.logger.debug(`🔒 AuthService.validateUser 验证密码 - userId: ${user.id}`);
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      this.logger.debug(`🔑 AuthService.validateUser 密码验证结果 - userId: ${user.id}, isValid: ${isPasswordValid}`);
+      
+      if (!isPasswordValid) {
+        this.logger.warn(`❌ AuthService.validateUser 密码错误 - userId: ${user.id}`);
+        return null;
+      }
+
+      this.logger.log(`✅ AuthService.validateUser 验证成功 - userId: ${user.id}, username: ${user.username}`);
+      
+      // 移除密码字段
+      const { password: _, ...result } = user;
+      return result;
+    } catch (error) {
+      this.logger.error(`💥 AuthService.validateUser 验证异常 - account: ${account}, error: ${error.message}`);
+      throw error;
+    }
   }
 
   /**

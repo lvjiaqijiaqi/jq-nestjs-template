@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseRepository } from '../../../common/repositories/base.repository';
@@ -6,6 +6,8 @@ import { User, UserStatus } from '../entities/user.entity';
 
 @Injectable()
 export class UserRepository extends BaseRepository<User> {
+  private readonly logger = new Logger(UserRepository.name);
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -54,16 +56,34 @@ export class UserRepository extends BaseRepository<User> {
     emailOrUsername: string, 
     includePassword = false
   ): Promise<User | null> {
-    const queryBuilder = this.userRepository.createQueryBuilder('user')
-      .where('user.email = :emailOrUsername OR user.username = :emailOrUsername', { 
-        emailOrUsername 
-      });
+    this.logger.debug(`🔍 UserRepository.findByEmailOrUsername 开始查询 - emailOrUsername: ${emailOrUsername}, includePassword: ${includePassword}`);
+    
+    try {
+      const queryBuilder = this.userRepository.createQueryBuilder('user')
+        .where('user.email = :emailOrUsername OR user.username = :emailOrUsername', { 
+          emailOrUsername 
+        });
 
-    if (includePassword) {
-      queryBuilder.addSelect('user.password');
+      if (includePassword) {
+        queryBuilder.addSelect('user.password');
+      }
+
+      this.logger.debug(`📝 UserRepository.findByEmailOrUsername SQL查询: ${queryBuilder.getSql()}`);
+      this.logger.debug(`📝 UserRepository.findByEmailOrUsername 参数: ${JSON.stringify(queryBuilder.getParameters())}`);
+
+      const result = await queryBuilder.getOne();
+      
+      if (result) {
+        this.logger.log(`✅ UserRepository.findByEmailOrUsername 找到用户 - userId: ${result.id}, username: ${result.username}, email: ${result.email}`);
+      } else {
+        this.logger.warn(`❌ UserRepository.findByEmailOrUsername 未找到用户 - emailOrUsername: ${emailOrUsername}`);
+      }
+      
+      return result;
+    } catch (error) {
+      this.logger.error(`💥 UserRepository.findByEmailOrUsername 查询异常 - emailOrUsername: ${emailOrUsername}, error: ${error.message}`);
+      throw error;
     }
-
-    return await queryBuilder.getOne();
   }
 
   /**

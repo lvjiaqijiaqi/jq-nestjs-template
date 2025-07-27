@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Get, Patch } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Patch, Logger } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthService } from '../services/auth.service';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
@@ -22,15 +22,31 @@ import { ApiDocumentation } from '../../../common/decorators/api-response.decora
 @ApiTags('认证')
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
+
   constructor(private readonly authService: AuthService) {}
 
   @Public()
   @Post('login')
-  @UseGuards(LocalAuthGuard)
+  // @UseGuards(LocalAuthGuard)  // 临时注释掉，直接测试
   @ApiDocumentation('用户登录', '认证', LoginResponseDto, '登录成功')
   async login(@Body() loginDto: LoginDto): Promise<ResponseDto<LoginResponseDto>> {
-    const result = await this.authService.login(loginDto);
-    return ResponseDto.success(result, '登录成功');
+    this.logger.log(`🚀 AuthController.login 收到请求 - Body: ${JSON.stringify(loginDto)}`);
+    this.logger.log(`🚀 AuthController.login 开始处理登录请求 - account: ${loginDto.account}`);
+    
+    try {
+      // 直接调用 validateUser 测试
+      this.logger.log(`🔍 AuthController.login 直接测试validateUser`);
+      const user = await this.authService.validateUser(loginDto.account, loginDto.password);
+      this.logger.log(`🔍 AuthController.login validateUser结果: ${user ? '成功' : '失败'}`);
+      
+      const result = await this.authService.login(loginDto);
+      this.logger.log(`✅ AuthController.login 登录成功 - account: ${loginDto.account}, userId: ${result.user?.id}`);
+      return ResponseDto.success(result, '登录成功');
+    } catch (error) {
+      this.logger.error(`💥 AuthController.login 登录失败 - account: ${loginDto.account}, error: ${error.message}, stack: ${error.stack}`);
+      throw error;
+    }
   }
 
   @Public()
