@@ -12,8 +12,6 @@ export enum UserStatus {
 // 角色现在使用独立的Role实体管理
 
 @Entity('users')
-@Index(['email'], { unique: true })
-@Index(['username'], { unique: true })
 export class User extends BaseEntity {
   @ApiProperty({ description: '用户名', example: 'john_doe' })
   @Column({

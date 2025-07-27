@@ -4,9 +4,31 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // 创建应用时启用详细日志
+  const app = await NestFactory.create(AppModule, {
+    logger: ['log', 'error', 'warn', 'debug', 'verbose'],
+  });
+  
   const configService = app.get(ConfigService);
   const logger = new Logger('Bootstrap');
+
+  // 添加 HTTP 请求日志中间件
+  app.use((req, res, next) => {
+    const { method, originalUrl } = req;
+    const userAgent = req.get('User-Agent') || '';
+    
+    logger.log(`🔗 ${method} ${originalUrl} - ${userAgent}`);
+    
+    // 记录响应时间
+    const start = Date.now();
+    res.on('finish', () => {
+      const { statusCode } = res;
+      const duration = Date.now() - start;
+      logger.log(`✅ ${method} ${originalUrl} ${statusCode} - ${duration}ms`);
+    });
+    
+    next();
+  });
 
   // 全局验证管道
   app.useGlobalPipes(
@@ -39,6 +61,7 @@ async function bootstrap() {
 
   logger.log(`🚀 ${appName} is running on: http://localhost:${port}`);
   logger.log(`📄 Environment: ${nodeEnv}`);
+  logger.log(`📊 Logs enabled: HTTP requests, Database queries, Application events`);
 }
 
 bootstrap().catch((error) => {
