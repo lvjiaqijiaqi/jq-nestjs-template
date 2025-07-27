@@ -1,5 +1,259 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
+# 快速开始指南
+
+## 🚀 项目概述
+
+这是一个**企业级NestJS样板工程**，包含了现代Web应用开发的所有核心功能。完整文档请参考 [QUICK_START.md](mdc:docs/QUICK_START.md)。
+
+### 🎯 核心特性
+
+- 🏗️ **完整基础架构** - 模块化设计、TypeScript、环境配置
+- 🗄️ **数据库集成** - TypeORM + MySQL，迁移管理，Repository模式
+- 🔐 **认证授权系统** - JWT + RBAC权限控制，完整用户角色管理
+- 🛡️ **安全中间件** - 多层安全防护，请求限流，XSS防护
+- 📡 **API设计** - Swagger文档，统一响应格式，版本控制
+- ⚡ **性能优化** - Redis缓存，数据库优化，性能监控
+- 🔧 **队列系统** - Bull队列，异步任务处理
+- 📊 **监控健康检查** - Prometheus指标，健康检查端点
+
+## ⚡ 快速启动
+
+### 1. 环境要求
+
+- **Node.js** >= 18.x
+- **npm** >= 9.x
+- **Docker** >= 20.x（推荐）
+- **MySQL** >= 8.0
+- **Redis** >= 6.x
+
+### 2. 项目初始化
+
+```bash
+# 安装依赖
+npm install
+
+# 复制环境配置
+cp .env.example .env
+
+# 编辑配置文件（必须）
+nano .env
+```
+
+### 3. 关键配置
+
+编辑 [.env](mdc:.env.example) 文件：
+
+```env
+# 应用配置
+NODE_ENV=development
+PORT=3000
+APP_NAME=jq-project-template
+
+# 数据库配置 (必须修改)
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=your_password
+DB_NAME=main
+
+# Redis配置
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# JWT密钥 (生产环境必须修改)
+JWT_SECRET=your-super-secret-key-change-in-production
+JWT_REFRESH_SECRET=your-refresh-secret-key-change-in-production
+```
+
+### 4. 启动方式
+
+#### 🐳 Docker启动（推荐）
+
+```bash
+# 启动完整开发环境
+docker-compose -f docker-compose.dev.yml up -d
+
+# 查看服务状态
+docker-compose -f docker-compose.dev.yml ps
+
+# 查看应用日志
+docker-compose -f docker-compose.dev.yml logs -f app
+```
+
+#### 💻 本地启动
+
+```bash
+# 启动数据库服务（如果本地没有）
+docker-compose -f docker-compose.dev.yml up -d mysql redis
+
+# 数据库迁移
+npm run migration:run
+
+# 导入种子数据
+npm run seed:auth
+
+# 启动应用
+npm run start:dev
+```
+
+## 🔍 验证安装
+
+访问以下地址确认服务正常：
+
+- **应用主页**: http://localhost:3000
+- **API文档**: http://localhost:3000/api/docs
+- **健康检查**: http://localhost:3000/api/health
+
+## 🔐 测试登录
+
+### 默认管理员账户
+
+```bash
+用户名: admin
+密码: admin123
+```
+
+### API测试
+
+```bash
+# 登录获取token
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# 获取用户列表
+curl -X GET "http://localhost:3000/api/users" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+## 🛠️ 开发工具
+
+### 常用命令
+
+```bash
+# 开发模式
+npm run start:dev      # 启动开发服务器
+npm run start:debug    # 启动调试模式
+
+# 代码质量
+npm run lint           # 代码检查
+npm run format         # 代码格式化
+npm run test           # 运行测试
+
+# 数据库
+npm run migration:run  # 执行迁移
+npm run seed:auth      # 导入种子数据
+```
+
+### 推荐IDE配置
+
+项目包含VSCode配置文件：
+- **调试配置**: [.vscode/launch.json](mdc:.vscode/launch.json)
+- **任务配置**: [.vscode/tasks.json](mdc:.vscode/tasks.json)
+
+## 📁 项目结构快览
+
+```
+src/
+├── modules/           # 业务模块
+│   ├── auth/         # 认证授权
+│   ├── user/         # 用户管理
+│   ├── audit/        # 审计日志
+│   ├── cache/        # 缓存系统
+│   └── queue/        # 队列系统
+├── common/           # 通用组件
+│   ├── decorators/   # 装饰器
+│   ├── dto/          # 基础DTO
+│   ├── guards/       # 守卫
+│   └── interceptors/ # 拦截器
+├── config/           # 配置管理
+└── utils/            # 工具函数
+```
+
+## 🎯 开发路径
+
+### 新开发者学习顺序
+
+1. **📖 项目架构** - 了解 [项目架构指南](mdc:.cursor/rules/nestjs-architecture.mdc)
+2. **🌐 API规范** - 学习 [API调用规范](mdc:.cursor/rules/api-development-guide.mdc)
+3. **⚙️ 开发流程** - 掌握 [开发工作流](mdc:.cursor/rules/development-workflow.mdc)
+4. **❓ 问题解决** - 查阅 [FAQ文档](mdc:docs/FAQ.md)
+
+### 二次开发快速指引
+
+1. **创建新模块**: 参考 [用户模块](mdc:src/modules/user) 的结构
+2. **API开发**: 使用统一的 DTO、Service、Controller 模式
+3. **权限控制**: 使用 `@Auth()` 和 `@RequirePermissions()` 装饰器
+4. **数据库操作**: 基于 TypeORM Repository 模式
+
+## 🔧 故障排除
+
+### 常见问题
+
+**数据库连接失败**
+```bash
+# 检查数据库服务
+docker-compose -f docker-compose.dev.yml ps mysql
+
+# 重启数据库
+docker-compose -f docker-compose.dev.yml restart mysql
+```
+
+**Redis连接失败**
+```bash
+# 检查Redis服务
+docker-compose -f docker-compose.dev.yml ps redis
+
+# 重启Redis
+docker-compose -f docker-compose.dev.yml restart redis
+```
+
+**端口占用**
+```bash
+# 查看端口占用
+lsof -i :3000
+
+# 修改端口（.env文件）
+PORT=3001
+```
+
+### 日志查看
+
+```bash
+# 应用日志
+docker-compose -f docker-compose.dev.yml logs -f app
+
+# 数据库日志
+docker-compose -f docker-compose.dev.yml logs -f mysql
+
+# Redis日志
+docker-compose -f docker-compose.dev.yml logs -f redis
+```
+
+## 📚 进阶学习
+
+### 完成模块报告
+
+- [认证授权系统](mdc:docs/completed/AUTH_SYSTEM_COMPLETED.md)
+- [安全中间件](mdc:docs/completed/SECURITY_MIDDLEWARE_COMPLETED.md)
+- [性能优化](mdc:docs/completed/PERFORMANCE_OPTIMIZATION_COMPLETED.md)
+- [监控健康检查](mdc:docs/completed/MONITORING_HEALTH_COMPLETED.md)
+
+### 开发文档
+
+- [开发规范指南](mdc:docs/DEVELOPMENT_GUIDE.md)
+- [API文档说明](mdc:docs/API_DOCUMENTATION.md)
+- [常见问题解答](mdc:docs/FAQ.md)
+
+## 🎉 恭喜！
+
+您已经成功启动了NestJS样板工程！现在可以开始您的开发之旅了。
+
+**下一步建议**：
+1. 浏览API文档了解可用接口
+2. 查看已有模块的实现方式
+3. 根据需求开发新的业务模块

@@ -1,5 +1,98 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
+# NestJS 项目架构指南
+
+## 📁 项目结构概览
+
+这是一个**企业级NestJS样板工程**，采用模块化架构设计。参考 [ARCHITECTURE.md](mdc:docs/ARCHITECTURE.md) 了解完整架构说明。
+
+### 🏗️ 核心目录结构
+
+```
+src/
+├── app.module.ts              # 应用主模块
+├── main.ts                    # 应用入口文件
+├── modules/                   # 业务模块
+│   ├── auth/                  # 认证授权模块
+│   ├── user/                  # 用户管理模块
+│   ├── audit/                 # 审计日志模块
+│   ├── cache/                 # 缓存模块
+│   └── queue/                 # 队列模块
+├── common/                    # 通用组件
+│   ├── decorators/            # 自定义装饰器
+│   ├── dto/                   # 基础DTO
+│   ├── filters/               # 异常过滤器
+│   ├── guards/                # 守卫
+│   ├── interceptors/          # 拦截器
+│   └── middleware/            # 中间件
+├── config/                    # 配置管理
+├── shared/                    # 共享模块
+└── utils/                     # 工具函数
+```
+
+## 🎯 开发模式
+
+### 新建业务模块标准流程
+
+1. **创建模块目录**: `src/modules/your-module/`
+2. **必需文件结构**:
+   ```
+   your-module/
+   ├── controllers/           # 控制器层
+   ├── services/             # 业务逻辑层
+   ├── entities/             # 数据实体
+   ├── dto/                  # 数据传输对象
+   └── your-module.module.ts # 模块定义
+   ```
+
+### 文件命名规范
+
+- **控制器**: `user.controller.ts`
+- **服务**: `user.service.ts`
+- **实体**: `user.entity.ts`
+- **DTO**: `user.dto.ts`
+- **模块**: `user.module.ts`
+
+## 🔧 核心特性
+
+### 已集成功能模块
+
+- ✅ **认证授权系统** - JWT + RBAC权限控制
+- ✅ **数据库集成** - TypeORM + MySQL
+- ✅ **缓存系统** - Redis缓存策略
+- ✅ **队列系统** - Bull队列异步处理
+- ✅ **安全中间件** - 多层安全防护
+- ✅ **API文档** - Swagger/OpenAPI集成
+- ✅ **监控健康检查** - Prometheus + 健康检查
+- ✅ **测试框架** - Jest单元测试 + E2E测试
+
+### 关键配置文件
+
+- **环境配置**: [.env.example](mdc:.env.example)
+- **数据库配置**: [src/config/database.config.ts](mdc:src/config/database.config.ts)
+- **应用配置**: [src/config/app.config.ts](mdc:src/config/app.config.ts)
+
+## 📚 学习路径
+
+### 新开发者必读
+
+1. **快速开始**: 查看 [QUICK_START.md](mdc:docs/QUICK_START.md)
+2. **开发规范**: 查看 [DEVELOPMENT_GUIDE.md](mdc:docs/DEVELOPMENT_GUIDE.md)
+3. **API规范**: 查看 [API_DOCUMENTATION.md](mdc:docs/API_DOCUMENTATION.md)
+
+### 架构深度理解
+
+1. **完成报告**: 查看 [docs/completed/README.md](mdc:docs/completed/README.md)
+2. **认证系统**: 查看 [src/modules/auth/](mdc:src/modules/auth)
+3. **用户管理**: 查看 [src/modules/user/](mdc:src/modules/user)
+
+## 🎨 设计原则
+
+- **模块化设计** - 每个功能独立成模块
+- **层次分离** - Controller → Service → Repository
+- **依赖注入** - 使用NestJS的DI容器
+- **类型安全** - 严格的TypeScript类型检查
+- **统一响应** - 标准化的API响应格式

@@ -1,5 +1,291 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
+# API 开发调用规范
+
+## 🌐 API 基础信息
+
+参考 [API_DOCUMENTATION.md](mdc:docs/API_DOCUMENTATION.md) 获取完整API文档。
+
+### 基本配置
+
+- **基础URL**: `http://localhost:3000` (开发环境)
+- **API前缀**: `/api/v1`
+- **文档地址**: `/api/docs` (Swagger UI)
+- **认证方式**: JWT Bearer Token
+- **内容类型**: `application/json`
+
+## 📋 统一响应格式
+
+### 成功响应结构
+
+```typescript
+interface ResponseDto<T> {
+  code: number;        // 200 = 成功
+  message: string;     // 响应消息
+  data: T;            // 响应数据
+  timestamp: string;   // 时间戳
+}
+```
+
+### 分页响应结构
+
+```typescript
+interface PaginatedResponseDto<T> {
+  code: number;
+  message: string;
+  data: {
+    items: T[];         // 数据列表
+    total: number;      // 总记录数
+    page: number;       // 当前页码
+    pageSize: number;   // 每页大小
+    totalPages: number; // 总页数
+  };
+  timestamp: string;
+}
+```
+
+## 🔐 认证授权
+
+### 1. 用户登录
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "登录成功",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIs...",
+    "expiresIn": 900,
+    "user": {
+      "id": "uuid",
+      "username": "admin",
+      "nickname": "管理员"
+    }
+  }
+}
+```
+
+### 2. 请求头认证
+
+```http
+GET /api/protected-endpoint
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+### 3. 刷新令牌
+
+```http
+POST /api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+## 👤 用户管理 API
+
+### 获取用户列表 (分页)
+
+```http
+GET /api/users?page=1&pageSize=10&keyword=john&status=ACTIVE
+Authorization: Bearer <token>
+```
+
+### 获取用户详情
+
+```http
+GET /api/users/{userId}
+Authorization: Bearer <token>
+```
+
+### 更新用户资料
+
+```http
+PUT /api/users/{userId}/profile
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "nickname": "新昵称",
+  "phone": "13800138000"
+}
+```
+
+### 管理员更新用户
+
+```http
+PUT /api/users/{userId}
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "email": "new@example.com",
+  "status": "ACTIVE",
+  "roleId": "role-uuid"
+}
+```
+
+## ❌ 错误处理
+
+### 错误码规范
+
+错误码格式: `AABBCC` (6位数字)
+- **AA**: 模块编号 (10-99)
+- **BB**: 错误类型 (00-99)  
+- **CC**: 具体错误 (01-99)
+
+### 常用错误码
+
+| 错误码 | HTTP状态 | 错误信息 | 说明 |
+|--------|----------|----------|------|
+| 100001 | 404 | 用户不存在 | 用户查询失败 |
+| 100002 | 409 | 用户名已存在 | 创建用户冲突 |
+| 200001 | 401 | 用户名或密码错误 | 登录凭据无效 |
+| 200002 | 401 | 访问令牌已过期 | 需要刷新令牌 |
+| 300001 | 403 | 访问被拒绝 | 权限不足 |
+
+### 错误响应示例
+
+```json
+{
+  "code": 100001,
+  "message": "用户不存在",
+  "data": null,
+  "timestamp": "2025-07-27T10:30:00.000Z",
+  "path": "/api/v1/users/invalid-id"
+}
+```
+
+## 📄 分页查询
+
+### 标准分页参数
+
+```typescript
+interface PaginationDto {
+  page?: number;          // 页码 (默认: 1)
+  pageSize?: number;      // 每页大小 (默认: 10, 最大: 100)
+  sortBy?: string;        // 排序字段 (默认: 'createdAt')
+  sortOrder?: 'ASC'|'DESC'; // 排序方向 (默认: 'DESC')
+}
+```
+
+### 查询示例
+
+```http
+GET /api/users?page=2&pageSize=20&sortBy=username&sortOrder=ASC&keyword=admin
+```
+
+## 🔧 业务模块 API
+
+### 审计日志 API
+
+```http
+# 获取审计日志
+GET /api/audit-logs?page=1&pageSize=10&actionType=USER_LOGIN
+Authorization: Bearer <token>
+
+# 获取用户操作历史
+GET /api/audit-logs/user/{userId}
+Authorization: Bearer <token>
+```
+
+### 缓存管理 API
+
+```http
+# 清除指定缓存
+DELETE /api/cache/{key}
+Authorization: Bearer <token>
+
+# 获取缓存统计
+GET /api/cache/stats
+Authorization: Bearer <token>
+```
+
+### 队列管理 API
+
+```http
+# 获取队列状态
+GET /api/queues/status
+Authorization: Bearer <token>
+
+# 添加邮件任务
+POST /api/queues/email
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "to": "user@example.com",
+  "subject": "邮件主题",
+  "template": "welcome",
+  "context": { "username": "张三" }
+}
+```
+
+## 🚀 快速测试
+
+### 使用 curl 测试
+
+```bash
+# 1. 登录获取token
+TOKEN=$(curl -s -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}' \
+  | jq -r '.data.accessToken')
+
+# 2. 使用token访问API
+curl -X GET http://localhost:3000/api/users \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### 前端 JavaScript 示例
+
+```javascript
+// 登录
+const login = async (username, password) => {
+  const response = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+  });
+  return response.json();
+};
+
+// 带认证的API调用
+const fetchUsers = async (token, page = 1) => {
+  const response = await fetch(`/api/users?page=${page}`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  return response.json();
+};
+```
+
+## 📊 接口权限
+
+### 权限级别
+
+- **Public** 🌍 - 无需认证
+- **Authenticated** 🔒 - 需要登录  
+- **Role-based** 👮 - 基于角色
+- **Permission-based** 🎫 - 基于权限
+
+### 权限标记示例
+
+查看具体控制器文件了解权限要求:
+- [用户控制器](mdc:src/modules/user/controllers/user.controller.ts)
+- [认证控制器](mdc:src/modules/auth/controllers/auth.controller.ts)

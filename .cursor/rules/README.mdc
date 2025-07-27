@@ -1,5 +1,125 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
+# NestJS 企业级样板工程 - Cursor Rules 导航
+
+欢迎使用NestJS企业级样板工程！本规则集将帮助您快速熟悉项目架构、功能特性和开发规范。
+
+## 🎯 快速导航
+
+### 🏁 新手入门
+- **[快速开始指南](mdc:.cursor/rules/quick-start-guide.mdc)** - 🚀 项目启动、环境配置、测试验证
+- **[项目架构指南](mdc:.cursor/rules/nestjs-architecture.mdc)** - 🏗️ 模块结构、设计原则、核心特性
+
+### 🛠️ 开发规范
+- **[开发工作流规范](mdc:.cursor/rules/development-workflow.mdc)** - ⚙️ 新功能开发流程、代码规范、测试编写
+- **[API调用规范](mdc:.cursor/rules/api-development-guide.mdc)** - 🌐 API格式、认证方式、前端调用指南
+
+## 📚 项目特性概览
+
+### ✅ 已实现功能
+
+- 🏗️ **基础架构** - 模块化设计、TypeScript、环境配置
+- 🗄️ **数据库集成** - TypeORM + MySQL + 迁移管理
+- 🔐 **认证授权** - JWT + RBAC + 用户角色管理
+- 🛡️ **安全防护** - 多层安全中间件 + 请求限流
+- 📡 **API系统** - Swagger文档 + 统一响应格式
+- ⚡ **性能优化** - Redis缓存 + 数据库优化
+- 🔧 **队列系统** - Bull队列 + 异步任务处理
+- 📊 **监控系统** - Prometheus + 健康检查
+- 🧪 **测试框架** - Jest + E2E测试
+- 🚀 **部署运维** - Docker + CI/CD
+
+### 🏢 业务基础模块
+
+- 👤 **用户管理增强** - 用户资料、状态管理、权限查询、批量操作
+- 📋 **审计日志系统** - 操作追踪、风险级别、数据变更记录
+
+## 🔗 重要文档链接
+
+### 📖 完整文档
+- **[项目开发路线图](mdc:DEVELOPMENT_ROADMAP.md)** - 项目规划和进度
+- **[快速开始文档](mdc:docs/QUICK_START.md)** - 详细启动指南
+- **[开发规范文档](mdc:docs/DEVELOPMENT_GUIDE.md)** - 完整开发规范
+- **[API使用文档](mdc:docs/API_DOCUMENTATION.md)** - 详细API说明
+- **[常见问题解答](mdc:docs/FAQ.md)** - 开发问题解决
+
+### 🎯 核心配置文件
+- **[环境配置模板](mdc:.env.example)** - 环境变量配置说明
+- **[TypeScript配置](mdc:tsconfig.json)** - 编译和路径配置
+- **[ESLint配置](mdc:.eslintrc.js)** - 代码质量规则
+- **[包管理配置](mdc:package.json)** - 依赖和脚本
+
+### 🏗️ 核心代码结构
+- **[应用主模块](mdc:src/app.module.ts)** - 应用入口模块
+- **[应用启动文件](mdc:src/main.ts)** - 应用启动配置
+- **[认证授权模块](mdc:src/modules/auth)** - 完整认证系统
+- **[用户管理模块](mdc:src/modules/user)** - 用户业务逻辑
+- **[通用组件目录](mdc:src/common)** - 共享组件和工具
+
+## 🎨 开发最佳实践
+
+### 新模块开发标准流程
+
+1. **📁 创建模块目录结构**
+   ```
+   src/modules/your-module/
+   ├── controllers/    # HTTP控制器
+   ├── services/      # 业务逻辑
+   ├── entities/      # 数据实体
+   ├── dto/          # 数据传输对象
+   └── your.module.ts # 模块定义
+   ```
+
+2. **🏷️ 遵循命名规范**
+   - 控制器: `your.controller.ts`
+   - 服务: `your.service.ts`
+   - 实体: `your.entity.ts`
+   - DTO: `your.dto.ts`
+
+3. **🔒 权限控制使用**
+   ```typescript
+   @Auth() // 需要登录
+   @RequirePermissions('module:action') // 需要权限
+   @RequireRoles('admin') // 需要角色
+   ```
+
+4. **📋 统一响应格式**
+   ```typescript
+   // 单一数据响应
+   ResponseDto<T>
+   // 分页数据响应  
+   PaginatedResponseDto<T>
+   ```
+
+## 🚀 快速命令参考
+
+```bash
+# 项目启动
+npm run start:dev              # 开发模式
+docker-compose -f docker-compose.dev.yml up -d  # Docker启动
+
+# 开发工具
+npm run lint                   # 代码检查
+npm run format                 # 代码格式化
+npm run test                   # 运行测试
+
+# 数据库操作
+npm run migration:run          # 执行迁移
+npm run seed:auth             # 导入种子数据
+```
+
+## 📞 获取帮助
+
+- **查看文档**: 优先查阅 `docs/` 目录下的相关文档
+- **查看示例**: 参考已实现的模块（如 `src/modules/user/`）
+- **常见问题**: 查阅 [FAQ文档](mdc:docs/FAQ.md)
+- **完成报告**: 查看 [完成模块报告](mdc:docs/completed/README.md)
+
+---
+
+**项目状态**: 🚀 生产就绪  
+**最后更新**: 2025-01-27  
+**技术栈**: NestJS + TypeScript + MySQL + Redis + Docker

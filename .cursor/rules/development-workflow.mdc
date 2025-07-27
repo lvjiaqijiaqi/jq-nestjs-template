@@ -1,5 +1,377 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
+# 开发工作流规范
+
+## 📏 代码规范
+
+参考 [DEVELOPMENT_GUIDE.md](mdc:docs/DEVELOPMENT_GUIDE.md) 获取完整开发规范。
+
+### TypeScript 编码规范
+
+```typescript
+// ✅ 推荐：明确的类型定义
+interface CreateUserDto {
+  readonly username: string;
+  readonly email: string;
+  readonly password: string;
+  readonly nickname?: string;
+}
+
+// ✅ 推荐：使用枚举
+enum UserStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  SUSPENDED = 'SUSPENDED',
+}
+
+// ✅ 推荐：异步函数类型标注
+async function getUserById(id: string): Promise<User> {
+  const user = await this.userRepository.findOne({ where: { id } });
+  if (!user) {
+    throw new NotFoundException('用户不存在');
+  }
+  return user;
+}
+```
+
+### 文件组织规范
+
+```
+模块目录结构:
+your-module/
+├── controllers/          # HTTP控制器
+│   └── your.controller.ts
+├── services/            # 业务逻辑服务
+│   └── your.service.ts
+├── entities/            # 数据库实体
+│   └── your.entity.ts
+├── dto/                 # 数据传输对象
+│   └── your.dto.ts
+├── guards/              # 权限守卫 (可选)
+│   └── your.guard.ts
+└── your.module.ts       # 模块定义
+```
+
+## 🔧 开发命令
+
+### 常用开发命令
+
+```bash
+# 开发服务器
+npm run start:dev          # 启动开发模式
+npm run start:debug        # 启动调试模式
+npm run build              # 构建项目
+
+# 代码质量
+npm run lint               # ESLint检查
+npm run lint:fix           # 自动修复代码问题
+npm run format             # Prettier格式化
+
+# 测试相关
+npm run test               # 运行单元测试
+npm run test:watch         # 监听模式测试
+npm run test:cov           # 测试覆盖率
+npm run test:e2e           # E2E测试
+
+# 数据库相关
+npm run migration:create   # 创建迁移文件
+npm run migration:run      # 执行迁移
+npm run migration:revert   # 回滚迁移
+npm run seed:auth          # 导入认证种子数据
+```
+
+## 📝 新功能开发流程
+
+### 1. 创建新模块
+
+```bash
+# 1. 创建模块目录
+mkdir -p src/modules/your-module/{controllers,services,entities,dto}
+
+# 2. 创建基础文件
+touch src/modules/your-module/your-module.module.ts
+touch src/modules/your-module/controllers/your.controller.ts
+touch src/modules/your-module/services/your.service.ts
+touch src/modules/your-module/entities/your.entity.ts
+touch src/modules/your-module/dto/your.dto.ts
+```
+
+### 2. 实体定义 (Entity)
+
+```typescript
+// src/modules/your-module/entities/your.entity.ts
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { BaseEntity } from '@/common/entities/base.entity';
+
+@Entity('your_table')
+export class YourEntity extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ length: 100 })
+  name: string;
+
+  @Column({ type: 'text', nullable: true })
+  description?: string;
+}
+```
+
+### 3. DTO定义 (Data Transfer Object)
+
+```typescript
+// src/modules/your-module/dto/your.dto.ts
+import { IsString, IsOptional, MaxLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { PaginationDto } from '@/common/dto/pagination.dto';
+
+export class CreateYourDto {
+  @ApiProperty({ description: '名称' })
+  @IsString()
+  @MaxLength(100)
+  name: string;
+
+  @ApiProperty({ description: '描述', required: false })
+  @IsOptional()
+  @IsString()
+  description?: string;
+}
+
+export class YourListDto extends PaginationDto {
+  @ApiProperty({ description: '搜索关键词', required: false })
+  @IsOptional()
+  @IsString()
+  keyword?: string;
+}
+```
+
+### 4. 服务层 (Service)
+
+```typescript
+// src/modules/your-module/services/your.service.ts
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { YourEntity } from '../entities/your.entity';
+import { CreateYourDto, YourListDto } from '../dto/your.dto';
+
+@Injectable()
+export class YourService {
+  constructor(
+    @InjectRepository(YourEntity)
+    private readonly yourRepository: Repository<YourEntity>,
+  ) {}
+
+  async create(createDto: CreateYourDto): Promise<YourEntity> {
+    const entity = this.yourRepository.create(createDto);
+    return this.yourRepository.save(entity);
+  }
+
+  async findAll(query: YourListDto): Promise<PaginatedResponseDto<YourEntity>> {
+    const queryBuilder = this.yourRepository.createQueryBuilder('item');
+    
+    if (query.keyword) {
+      queryBuilder.where('item.name LIKE :keyword', { 
+        keyword: `%${query.keyword}%` 
+      });
+    }
+
+    const [items, total] = await queryBuilder
+      .skip(query.skip)
+      .take(query.take)
+      .getManyAndCount();
+
+    return new PaginatedResponseDto(items, query.page, query.limit, total);
+  }
+}
+```
+
+### 5. 控制器 (Controller)
+
+```typescript
+// src/modules/your-module/controllers/your.controller.ts
+import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { YourService } from '../services/your.service';
+import { CreateYourDto, YourListDto } from '../dto/your.dto';
+import { ApiDocumentation } from '@/common/decorators/api-documentation.decorator';
+import { Auth } from '@/common/decorators/auth.decorator';
+
+@ApiTags('your-module')
+@Controller('your-module')
+@Auth()
+export class YourController {
+  constructor(private readonly yourService: YourService) {}
+
+  @Post()
+  @ApiDocumentation('创建项目', 'YourEntity')
+  async create(@Body() createDto: CreateYourDto) {
+    return this.yourService.create(createDto);
+  }
+
+  @Get()
+  @ApiDocumentation('获取项目列表', 'PaginatedResponseDto<YourEntity>')
+  async findAll(@Query() query: YourListDto) {
+    return this.yourService.findAll(query);
+  }
+}
+```
+
+### 6. 模块定义 (Module)
+
+```typescript
+// src/modules/your-module/your-module.module.ts
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { YourController } from './controllers/your.controller';
+import { YourService } from './services/your.service';
+import { YourEntity } from './entities/your.entity';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([YourEntity])],
+  controllers: [YourController],
+  providers: [YourService],
+  exports: [YourService],
+})
+export class YourModule {}
+```
+
+## 🗄️ 数据库操作
+
+### 迁移文件管理
+
+```bash
+# 创建新迁移
+npm run migration:create -- --name AddYourTable
+
+# 执行迁移
+npm run migration:run
+
+# 回滚迁移
+npm run migration:revert
+```
+
+### 种子数据
+
+```typescript
+// database/seeds/your-seed.ts
+import { DataSource } from 'typeorm';
+import { YourEntity } from '@/modules/your-module/entities/your.entity';
+
+export async function seedYourData(dataSource: DataSource) {
+  const repository = dataSource.getRepository(YourEntity);
+  
+  const seedData = [
+    { name: '示例1', description: '示例描述1' },
+    { name: '示例2', description: '示例描述2' },
+  ];
+
+  for (const data of seedData) {
+    const exists = await repository.findOne({ where: { name: data.name } });
+    if (!exists) {
+      await repository.save(repository.create(data));
+    }
+  }
+}
+```
+
+## 🧪 测试编写
+
+### 单元测试
+
+```typescript
+// src/modules/your-module/services/your.service.spec.ts
+import { Test, TestingModule } from '@nestjs/testing';
+import { YourService } from './your.service';
+import { Repository } from 'typeorm';
+import { YourEntity } from '../entities/your.entity';
+
+describe('YourService', () => {
+  let service: YourService;
+  let repository: Repository<YourEntity>;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        YourService,
+        {
+          provide: 'YourEntityRepository',
+          useClass: Repository,
+        },
+      ],
+    }).compile();
+
+    service = module.get<YourService>(YourService);
+    repository = module.get<Repository<YourEntity>>('YourEntityRepository');
+  });
+
+  it('should create item', async () => {
+    // 测试实现
+  });
+});
+```
+
+## 🔒 权限控制
+
+### 使用权限装饰器
+
+```typescript
+import { Auth } from '@/common/decorators/auth.decorator';
+import { RequirePermissions } from '@/common/decorators/permissions.decorator';
+import { RequireRoles } from '@/common/decorators/roles.decorator';
+
+@Controller('your-module')
+@Auth() // 需要登录
+export class YourController {
+  
+  @Get()
+  @RequirePermissions('your-module:read') // 需要特定权限
+  async findAll() {}
+
+  @Post()
+  @RequireRoles('admin') // 需要特定角色
+  async create() {}
+
+  @Delete(':id')
+  @RequirePermissions('your-module:delete')
+  async remove() {}
+}
+```
+
+## 📦 模块注册
+
+### 在主模块中注册
+
+```typescript
+// src/app.module.ts
+import { YourModule } from './modules/your-module/your-module.module';
+
+@Module({
+  imports: [
+    // ... 其他模块
+    YourModule,
+  ],
+})
+export class AppModule {}
+```
+
+## 🚀 部署前检查
+
+### 预发布检查清单
+
+- [ ] 运行所有测试: `npm run test`
+- [ ] 检查代码质量: `npm run lint`
+- [ ] 格式化代码: `npm run format`
+- [ ] 构建项目: `npm run build`
+- [ ] 检查环境变量配置
+- [ ] 执行数据库迁移
+- [ ] 更新API文档
+
+### 关键配置文件
+
+- **环境配置**: [.env.example](mdc:.env.example)
+- **ESLint配置**: [.eslintrc.js](mdc:.eslintrc.js)
+- **TypeScript配置**: [tsconfig.json](mdc:tsconfig.json)
+- **包管理**: [package.json](mdc:package.json)
