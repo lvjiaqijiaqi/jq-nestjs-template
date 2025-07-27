@@ -138,6 +138,119 @@ export const validationSchema = Joi.object({
   QUEUE_RATE_LIMIT_MAX: Joi.number().default(100),
   QUEUE_RATE_LIMIT_DURATION: Joi.number().default(60000),
 
+  // 监控配置
+  // 健康检查配置
+  HEALTH_CHECK_ENABLED: Joi.string().valid('true', 'false').default('true'),
+  HEALTH_CHECK_ENDPOINT: Joi.string().default('/health'),
+  HEALTH_CHECK_TIMEOUT: Joi.number().default(5000),
+  HEALTH_CHECK_RETRIES: Joi.number().default(3),
+  GRACEFUL_SHUTDOWN_ENABLED: Joi.string().valid('true', 'false').default('false'),
+  GRACEFUL_SHUTDOWN_TIMEOUT: Joi.number().default(30000),
+  
+  // 健康检查项配置
+  HEALTH_CHECK_DATABASE: Joi.string().valid('true', 'false').default('true'),
+  HEALTH_CHECK_REDIS: Joi.string().valid('true', 'false').default('true'),
+  HEALTH_CHECK_QUEUE: Joi.string().valid('true', 'false').default('true'),
+  HEALTH_CHECK_MEMORY: Joi.string().valid('true', 'false').default('true'),
+  HEALTH_CHECK_DISK: Joi.string().valid('true', 'false').default('true'),
+  HEALTH_CHECK_EXTERNAL: Joi.string().valid('true', 'false').default('false'),
+  
+  // 指标收集配置
+  METRICS_ENABLED: Joi.string().valid('true', 'false').default('true'),
+  METRICS_ENDPOINT: Joi.string().default('/metrics'),
+  METRICS_PREFIX: Joi.string().default('nestjs_'),
+  COLLECT_DEFAULT_METRICS: Joi.string().valid('true', 'false').default('true'),
+  METRICS_COLLECT_INTERVAL: Joi.number().default(10000),
+  
+  // HTTP指标配置
+  HTTP_METRICS_ENABLED: Joi.string().valid('true', 'false').default('true'),
+  HTTP_PATH_NORMALIZATION: Joi.string().valid('true', 'false').default('false'),
+  HTTP_METRICS_EXCLUDE_PATHS: Joi.string().default('/health,/metrics'),
+  HTTP_INCLUDE_STATUS_CODE: Joi.string().valid('true', 'false').default('true'),
+  HTTP_INCLUDE_METHOD: Joi.string().valid('true', 'false').default('true'),
+  HTTP_INCLUDE_PATH: Joi.string().valid('true', 'false').default('true'),
+  
+  // APM配置
+  APM_ENABLED: Joi.string().valid('true', 'false').default('false'),
+  APM_SERVICE_NAME: Joi.string().default('jq-project-template'),
+  APM_SERVICE_VERSION: Joi.string().default('1.0.0'),
+  APM_ENVIRONMENT: Joi.string().optional(),
+  APM_TRANSACTION_SAMPLE_RATE: Joi.number().min(0).max(1).default(1.0),
+  APM_CAPTURE_BODY: Joi.string().valid('off', 'errors', 'transactions', 'all').default('errors'),
+  APM_CAPTURE_HEADERS: Joi.string().valid('true', 'false').default('false'),
+  APM_LOG_LEVEL: Joi.string().valid('trace', 'debug', 'info', 'warn', 'error', 'fatal').default('info'),
+  
+  // 错误监控配置 (Sentry)
+  ERROR_MONITORING_ENABLED: Joi.string().valid('true', 'false').default('false'),
+  SENTRY_DSN: Joi.string().allow('').optional(),
+  SENTRY_ENVIRONMENT: Joi.string().optional(),
+  SENTRY_RELEASE: Joi.string().default('1.0.0'),
+  SENTRY_SAMPLE_RATE: Joi.number().min(0).max(1).default(1.0),
+  SENTRY_TRACES_SAMPLE_RATE: Joi.number().min(0).max(1).default(0.1),
+  SENTRY_ATTACH_STACKTRACE: Joi.string().valid('true', 'false').default('true'),
+  SENTRY_BEFORE_SEND: Joi.string().valid('true', 'false').default('false'),
+  SENTRY_HTTP_INTEGRATION: Joi.string().valid('true', 'false').default('true'),
+  SENTRY_CONSOLE_INTEGRATION: Joi.string().valid('true', 'false').default('false'),
+  SENTRY_MODULES_INTEGRATION: Joi.string().valid('true', 'false').default('false'),
+  
+  // 链路追踪配置 (Jaeger)
+  TRACING_ENABLED: Joi.string().valid('true', 'false').default('false'),
+  TRACING_SERVICE_NAME: Joi.string().default('jq-project-template'),
+  TRACING_ENDPOINT: Joi.string().default('http://localhost:14268/api/traces'),
+  TRACING_SAMPLER_TYPE: Joi.string().valid('const', 'probabilistic', 'rateLimiting', 'remote').default('const'),
+  TRACING_SAMPLER_PARAM: Joi.number().default(1),
+  TRACING_LOG_SPANS: Joi.string().valid('true', 'false').default('false'),
+  JAEGER_AGENT_HOST: Joi.string().default('localhost'),
+  JAEGER_AGENT_PORT: Joi.number().default(6832),
+  
+  // 性能阈值配置
+  RESPONSE_TIME_WARNING: Joi.number().default(1000),
+  RESPONSE_TIME_CRITICAL: Joi.number().default(3000),
+  MEMORY_WARNING_THRESHOLD: Joi.number().min(0).max(1).default(0.8),
+  MEMORY_CRITICAL_THRESHOLD: Joi.number().min(0).max(1).default(0.9),
+  CPU_WARNING_THRESHOLD: Joi.number().min(0).max(1).default(0.7),
+  CPU_CRITICAL_THRESHOLD: Joi.number().min(0).max(1).default(0.9),
+  DISK_WARNING_THRESHOLD: Joi.number().min(0).max(1).default(0.8),
+  DISK_CRITICAL_THRESHOLD: Joi.number().min(0).max(1).default(0.9),
+  ERROR_RATE_WARNING: Joi.number().min(0).max(1).default(0.05),
+  ERROR_RATE_CRITICAL: Joi.number().min(0).max(1).default(0.1),
+  QUEUE_BACKLOG_WARNING: Joi.number().default(100),
+  QUEUE_BACKLOG_CRITICAL: Joi.number().default(500),
+  
+  // 告警配置
+  ALERTING_ENABLED: Joi.string().valid('true', 'false').default('false'),
+  ALERT_EMAIL_ENABLED: Joi.string().valid('true', 'false').default('false'),
+  ALERT_EMAIL_RECIPIENTS: Joi.string().allow('').optional(),
+  ALERT_SMTP_HOST: Joi.string().allow('').optional(),
+  ALERT_SMTP_PORT: Joi.number().default(587),
+  ALERT_SMTP_SECURE: Joi.string().valid('true', 'false').default('false'),
+  ALERT_SMTP_USER: Joi.string().allow('').optional(),
+  ALERT_SMTP_PASS: Joi.string().allow('').optional(),
+  ALERT_WEBHOOK_ENABLED: Joi.string().valid('true', 'false').default('false'),
+  ALERT_WEBHOOK_URL: Joi.string().allow('').optional(),
+  ALERT_WEBHOOK_TIMEOUT: Joi.number().default(5000),
+  ALERT_WEBHOOK_RETRIES: Joi.number().default(3),
+  ALERT_SLACK_ENABLED: Joi.string().valid('true', 'false').default('false'),
+  SLACK_WEBHOOK_URL: Joi.string().allow('').optional(),
+  SLACK_CHANNEL: Joi.string().default('#alerts'),
+  SLACK_USERNAME: Joi.string().default('MonitorBot'),
+  
+  // 告警规则配置
+  ALERT_HEALTH_CHECK: Joi.string().valid('true', 'false').default('false'),
+  ALERT_HIGH_RESPONSE_TIME: Joi.string().valid('true', 'false').default('false'),
+  ALERT_HIGH_ERROR_RATE: Joi.string().valid('true', 'false').default('false'),
+  ALERT_HIGH_MEMORY: Joi.string().valid('true', 'false').default('false'),
+  ALERT_HIGH_CPU: Joi.string().valid('true', 'false').default('false'),
+  ALERT_HIGH_DISK: Joi.string().valid('true', 'false').default('false'),
+  ALERT_QUEUE_BACKLOG: Joi.string().valid('true', 'false').default('false'),
+  ALERT_COOLDOWN: Joi.number().default(300000),
+  
+  // 数据保留配置
+  METRICS_SHORT_TERM_RETENTION: Joi.number().default(604800),    // 7天
+  METRICS_LONG_TERM_RETENTION: Joi.number().default(2592000),   // 30天
+  TRACES_RETENTION: Joi.number().default(259200),               // 3天
+  LOGS_RETENTION: Joi.number().default(1209600),                // 14天
+
   // 安全配置
   CORS_ENABLED: Joi.string().valid('true', 'false').default('true'),
   CORS_CREDENTIALS: Joi.string().valid('true', 'false').default('true'),
@@ -169,7 +282,6 @@ export const validationSchema = Joi.object({
 
   // 健康检查配置
   HEALTH_CHECK_INTERVAL: Joi.number().default(30000),
-  HEALTH_CHECK_TIMEOUT: Joi.number().default(5000),
   HEALTH_CHECK_DETAILED: Joi.string().valid('true', 'false').default('false'),
 
   // 功能开关

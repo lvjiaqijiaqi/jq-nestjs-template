@@ -6,6 +6,7 @@ import securityConfig from './security.config';
 import loggerConfig from './logger.config';
 import cacheConfig from './cache.config';
 import queueConfig from './queue.config';
+import monitoringConfig from './monitoring.config';
 
 export const configurations = [
   appConfig,
@@ -16,6 +17,7 @@ export const configurations = [
   loggerConfig,
   cacheConfig,
   queueConfig,
+  monitoringConfig,
 ];
 
 export { validationSchema } from './validation.schema';
