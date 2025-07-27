@@ -1,8 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { createSwaggerConfig, swaggerOptions, swaggerUiOptions } from './config/swagger.config';
 
 // 正确导入helmet和compression
 const helmet = require('helmet');
@@ -63,6 +64,10 @@ async function bootstrap() {
   const port = configService.get<number>('app.port', 3000);
   const appName = configService.get<string>('app.name', 'jq-project-template');
   const nodeEnv = configService.get<string>('app.nodeEnv', 'development');
+  const apiPrefix = configService.get<string>('app.api.prefix', 'api');
+
+  // 设置全局API前缀
+  app.setGlobalPrefix(apiPrefix);
 
   // CORS 配置
   const corsEnabled = configService.get<boolean>('app.cors.enabled', true);
@@ -71,48 +76,32 @@ async function bootstrap() {
       origin: nodeEnv === 'production' ? false : true, // 生产环境需要配置具体域名
       credentials: configService.get<boolean>('app.cors.credentials', true),
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-API-Version', 'X-Request-Id'],
     });
   }
 
   // Swagger 文档配置
   if (nodeEnv !== 'production') {
-    const config = new DocumentBuilder()
-      .setTitle('NestJS API Documentation')
-      .setDescription('企业级 NestJS 样板项目 API 文档')
-      .setVersion('1.0')
-      .addBearerAuth(
-        {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          name: 'JWT',
-          description: 'Enter JWT token',
-          in: 'header',
-        },
-        'JWT-auth', // This name here is important for matching up with @ApiBearerAuth() in your controller!
-      )
-      .addTag('认证', '用户认证相关接口')
-      .addTag('应用', '应用基础接口')
-      .build();
+    const swaggerConfig = createSwaggerConfig();
+    const document = SwaggerModule.createDocument(app, swaggerConfig, swaggerOptions);
+    
+    // 设置Swagger文档路径
+    const docsPath = `${apiPrefix}/docs`;
+    SwaggerModule.setup(docsPath, app, document, swaggerUiOptions);
 
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api/docs', app, document, {
-      swaggerOptions: {
-        persistAuthorization: true,
-      },
-    });
-
-    logger.log(`📚 Swagger documentation: http://localhost:${port}/api/docs`);
+    logger.log(`📚 Swagger documentation: http://localhost:${port}/${docsPath}`);
+    logger.log(`📋 API 规范文档: http://localhost:${port}/${docsPath}-json`);
   }
 
   // 启动应用
   await app.listen(port);
 
   logger.log(`🚀 ${appName} is running on: http://localhost:${port}`);
+  logger.log(`🌐 API 基础路径: http://localhost:${port}/${apiPrefix}`);
   logger.log(`📄 Environment: ${nodeEnv}`);
-  logger.log(`🛡️ Security features enabled: Helmet, CORS, Rate Limiting, XSS Protection`);
+  logger.log(`🛡️ Security features enabled: Helmet, CORS, Rate Limiting, Input Validation`);
   logger.log(`📊 Logs enabled: HTTP requests, Database queries, Application events`);
+  logger.log(`🎯 Features: JWT Auth, RBAC, API Versioning, Unified Response, Error Codes`);
 }
 
 bootstrap().catch((error) => {
