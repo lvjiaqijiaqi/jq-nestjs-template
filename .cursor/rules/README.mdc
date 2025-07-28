@@ -15,7 +15,8 @@ alwaysApply: false
 
 ### 🛠️ 开发规范
 - **[开发工作流规范](mdc:.cursor/rules/development-workflow.mdc)** - ⚙️ 新功能开发流程、代码规范、测试编写
-- **[API调用规范](mdc:.cursor/rules/api-development-guide.mdc)** - 🌐 API格式、认证方式、前端调用指南
+- **[API调用规范](mdc:.cursor/rules/api-development-guide.mdc)** - �� API格式、认证方式、前端调用指南
+- **[NestJS通用组件指南](mdc:.cursor/rules/nestjs-common-components.mdc)** - 🔧 拦截器、过滤器、装饰器、验证器等组件使用
 
 ## 📚 项目特性概览
 
@@ -37,6 +38,15 @@ alwaysApply: false
 - 👤 **用户管理增强** - 用户资料、状态管理、权限查询、批量操作
 - 📋 **审计日志系统** - 操作追踪、风险级别、数据变更记录
 
+### 🔧 通用组件体系
+
+- **🔄 拦截器** - 响应转换、XSS过滤、缓存处理、API版本控制
+- **🛡️ 过滤器** - 全局异常处理、统一错误响应
+- **🎨 装饰器** - API文档生成、响应格式定义、缓存配置
+- **📦 DTO基类** - 分页、响应、实体基础数据传输对象
+- **✅ 验证器** - 强密码验证、自定义验证规则
+- **📝 常量定义** - 结构化错误码、系统常量
+
 ## 🔗 重要文档链接
 
 ### 📖 完整文档
@@ -47,7 +57,7 @@ alwaysApply: false
 - **[常见问题解答](mdc:docs/FAQ.md)** - 开发问题解决
 
 ### 🎯 核心配置文件
-- **[环境配置模板](mdc:.env.example)** - 环境变量配置说明
+- **[环境配置模板](mdc:env.example)** - 环境变量配置说明
 - **[TypeScript配置](mdc:tsconfig.json)** - 编译和路径配置
 - **[ESLint配置](mdc:.eslintrc.js)** - 代码质量规则
 - **[包管理配置](mdc:package.json)** - 依赖和脚本
@@ -94,6 +104,18 @@ alwaysApply: false
    PaginatedResponseDto<T>
    ```
 
+5. **🔧 使用通用组件**
+   ```typescript
+   // 继承基础类
+   export class YourDto extends BaseDto {}
+   export class YourEntity extends BaseEntity {}
+   export class YourRepository extends BaseRepository<YourEntity> {}
+   
+   // 使用装饰器
+   @ApiDocumentation('操作描述', '模块标签', ResponseType)
+   @Cacheable(key: 'cache:${id}', ttl: 300)
+   ```
+
 ## 🚀 快速命令参考
 
 ```bash
@@ -117,6 +139,7 @@ npm run seed:auth             # 导入种子数据
 - **查看示例**: 参考已实现的模块（如 `src/modules/user/`）
 - **常见问题**: 查阅 [FAQ文档](mdc:docs/FAQ.md)
 - **完成报告**: 查看 [完成模块报告](mdc:docs/completed/README.md)
+- **通用组件**: 查看 [通用组件指南](mdc:.cursor/rules/nestjs-common-components.mdc)
 
 ---
 

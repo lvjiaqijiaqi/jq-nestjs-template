@@ -1,0 +1,419 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# NestJS 通用组件功能指南
+
+## 📁 组件架构概览
+
+`src/common/` 目录包含了项目中可复用的 NestJS 核心组件，为整个应用提供基础功能支撑。
+
+### 🏗️ 目录结构
+
+```
+src/common/
+├── decorators/          # 自定义装饰器
+├── dto/                # 数据传输对象基类
+├── entities/           # 实体基类
+├── filters/            # 异常过滤器
+├── interceptors/       # 拦截器
+├── middleware/         # 中间件
+├── pipes/              # 管道（空）
+├── guards/             # 守卫（空）
+├── repositories/       # 仓库基类
+├── validators/         # 自定义验证器
+└── constants/          # 常量定义
+```
+
+## 🔧 **1. 拦截器 (Interceptors)**
+
+### 📍 位置：`src/common/interceptors/`
+
+#### **🌟 ResponseTransformInterceptor（响应转换拦截器）**
+
+**功能**：自动将控制器返回值包装成统一的响应格式
+
+```typescript
+// 使用示例
+@Injectable()
+export class ResponseTransformInterceptor<T> implements NestInterceptor<T, ResponseDto<T>> {
+  // 自动包装响应为标准格式
+  return ResponseDto.success(data, '操作成功', path, requestId);
+}
+
+// 跳过转换装饰器
+@SkipResponseTransform()
+@Get('raw-data')
+async getRawData() {
+  return { raw: 'data' }; // 不会被包装
+}
+```
+
+**特性**：
+- 🔄 自动响应格式标准化
+- 🆔 自动添加请求ID和时间戳
+- ⏭️ 支持跳过转换（`@SkipResponseTransform()`）
+- 🛡️ 智能检测已包装的响应
+
+#### **🔐 XssFilterInterceptor（XSS过滤拦截器）**
+
+**功能**：防止XSS攻击，过滤危险的HTML标签和脚本
+
+#### **📊 CacheInterceptor（缓存拦截器）**
+
+**功能**：提供基于Redis的HTTP响应缓存
+
+#### **🏷️ ApiVersionInterceptor（API版本拦截器）**
+
+**功能**：处理API版本控制和废弃警告
+
+## 🛡️ **2. 过滤器 (Filters)**
+
+### 📍 位置：`src/common/filters/`
+
+#### **⚠️ HttpExceptionFilter（HTTP异常过滤器）**
+
+**功能**：全局异常处理，统一错误响应格式
+
+```typescript
+@Catch()
+export class HttpExceptionFilter implements ExceptionFilter {
+  catch(exception: unknown, host: ArgumentsHost): void {
+    // 统一处理所有HTTP异常
+    // 返回标准化错误响应
+    return ResponseDto.error(errorCode, path, requestId, details);
+  }
+}
+```
+
+**特性**：
+- 🎯 捕获所有未处理异常
+- 📋 标准化错误响应格式
+- 🔍 详细的错误日志记录
+- 📊 区分验证错误和业务错误
+- 🆔 自动添加请求追踪信息
+
+## 🎨 **3. 装饰器 (Decorators)**
+
+### 📍 位置：`src/common/decorators/`
+
+#### **📚 API响应装饰器**
+
+```typescript
+// API成功响应
+@ApiSuccessResponse(UserDto, '获取用户信息成功')
+
+// API创建响应
+@ApiCreatedResponse(UserDto, '用户创建成功')
+
+// API错误响应（自动添加常见错误状态码）
+@ApiErrorResponses()
+
+// 完整API文档装饰器
+@ApiDocumentation('获取用户列表', '用户管理', UserDto, '获取成功')
+```
+
+**特性**：
+- 📖 自动生成Swagger文档
+- 🎯 统一响应格式定义
+- 📋 包含常见HTTP状态码
+- 🔗 支持复合装饰器使用
+
+#### **🏷️ API版本装饰器**
+
+```typescript
+@ApiVersion('1')           // 标记API版本
+@DeprecatedApiVersion('将在v2中移除') // 标记废弃API
+```
+
+#### **💾 缓存装饰器**
+
+```typescript
+@Cacheable(key: 'user:${id}', ttl: 300)  // 缓存方法结果
+@CacheEvict(key: 'user:${id}')           // 清除缓存
+@CachePut(key: 'user:${id}')             // 更新缓存
+@CacheConfig(keyPrefix: 'user:')         // 缓存配置
+```
+
+## 📦 **4. DTO (数据传输对象)**
+
+### 📍 位置：`src/common/dto/`
+
+#### **🏗️ BaseDto（基础DTO）**
+
+```typescript
+export class BaseDto {
+  id?: string;          // 通用ID字段
+  createdAt?: Date;     // 创建时间
+  updatedAt?: Date;     // 更新时间
+}
+
+export class CreateBaseDto {
+  createdBy?: string;   // 创建者ID
+}
+
+export class UpdateBaseDto {
+  updatedBy?: string;   // 更新者ID
+}
+```
+
+**用途**：
+- 🏗️ 所有DTO的基础类
+- 📅 统一时间字段格式
+- 👤 统一操作者记录
+
+#### **📋 PaginationDto（分页DTO）**
+
+```typescript
+export class PaginationDto {
+  page: number = 1;           // 页码
+  pageSize: number = 10;      // 每页大小
+  sortBy?: string;           // 排序字段
+  sortOrder?: 'ASC' | 'DESC'; // 排序方向
+}
+```
+
+**特性**：
+- 📊 标准分页参数
+- ✅ 内置参数验证
+- 🔄 自动计算skip和take
+
+#### **🎯 ResponseDto（响应DTO）**
+
+```typescript
+export class ResponseDto<T> {
+  code: number;        // 响应码
+  message: string;     // 响应消息
+  data: T;            // 响应数据
+  timestamp: string;   // 时间戳
+  path?: string;      // 请求路径
+  requestId?: string; // 请求ID
+}
+```
+
+**静态方法**：
+```typescript
+ResponseDto.success(data, message);     // 成功响应
+ResponseDto.error(errorCode, path);     // 错误响应
+ResponseDto.customError(status, msg);   // 自定义错误
+```
+
+## 🗄️ **5. 实体基类 (Entities)**
+
+### 📍 位置：`src/common/entities/`
+
+#### **🏗️ BaseEntity（基础实体）**
+
+```typescript
+export abstract class BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
+
+  @DeleteDateColumn({ type: 'timestamp' })
+  deletedAt?: Date;
+}
+```
+
+**特性**：
+- 🆔 统一UUID主键
+- 📅 自动时间戳管理
+- 🗑️ 软删除支持
+- 🔄 自动更新时间
+
+## 🏪 **6. 仓库基类 (Repositories)**
+
+### 📍 位置：`src/common/repositories/`
+
+#### **🏗️ BaseRepository（基础仓库）**
+
+```typescript
+export abstract class BaseRepository<T extends BaseEntity> {
+  // 通用CRUD操作
+  async findById(id: string): Promise<T>;
+  async findAll(options?: FindManyOptions<T>): Promise<T[]>;
+  async create(entity: DeepPartial<T>): Promise<T>;
+  async update(id: string, entity: DeepPartial<T>): Promise<T>;
+  async softDelete(id: string): Promise<void>;
+}
+```
+
+**特性**：
+- 🔄 标准CRUD操作
+- 🛡️ 类型安全
+- 🗑️ 软删除支持
+- 📊 分页查询支持
+
+## ✅ **7. 验证器 (Validators)**
+
+### 📍 位置：`src/common/validators/`
+
+#### **🔐 IsStrongPassword（强密码验证器）**
+
+```typescript
+export class CreateUserDto {
+  @IsStrongPassword({
+    message: '密码必须包含大小写字母、数字和特殊字符'
+  })
+  password: string;
+}
+```
+
+**验证规则**：
+- 📏 最小长度检查
+- 🔤 大小写字母要求
+- 🔢 数字字符要求
+- 🔣 特殊字符要求
+- ⚙️ 可配置验证策略
+
+## 📝 **8. 常量定义 (Constants)**
+
+### 📍 位置：`src/common/constants/`
+
+#### **❌ ERROR_CODES（错误码定义）**
+
+```typescript
+export const ERROR_CODES = {
+  // 用户模块 (10xxxx)
+  USER_NOT_FOUND: { code: 100001, message: '用户不存在' },
+  USER_ALREADY_EXISTS: { code: 100002, message: '用户已存在' },
+  
+  // 认证模块 (20xxxx)
+  INVALID_CREDENTIALS: { code: 200001, message: '用户名或密码错误' },
+  TOKEN_EXPIRED: { code: 200002, message: '令牌已过期' },
+  
+  // 权限模块 (30xxxx)
+  ACCESS_DENIED: { code: 300001, message: '访问被拒绝' },
+  INSUFFICIENT_PERMISSIONS: { code: 300002, message: '权限不足' },
+};
+```
+
+**错误码规范**：
+- 📊 6位数字格式：AABBCC
+- 🏷️ AA：模块编号（10-99）
+- 🔢 BB：错误类型（00-99）
+- 📋 CC：具体错误（01-99）
+
+## 🔧 **使用最佳实践**
+
+### **📦 在业务模块中使用**
+
+```typescript
+// 1. 继承基础类
+export class UserDto extends BaseDto {
+  username: string;
+  email: string;
+}
+
+// 2. 使用装饰器
+@Controller('users')
+@ApiTags('用户管理')
+export class UserController {
+  
+  @Get()
+  @ApiDocumentation('获取用户列表', '用户管理', 'PaginatedResponseDto<UserDto>')
+  async findUsers(@Query() query: PaginationDto) {
+    return this.userService.findAll(query);
+  }
+}
+
+// 3. 继承仓库基类
+@Injectable()
+export class UserRepository extends BaseRepository<User> {
+  async findByEmail(email: string): Promise<User | null> {
+    return this.repository.findOne({ where: { email } });
+  }
+}
+
+// 4. 使用验证器
+export class CreateUserDto {
+  @IsEmail()
+  email: string;
+
+  @IsStrongPassword()
+  password: string;
+}
+```
+
+### **🎯 全局配置**
+
+```typescript
+// app.module.ts
+@Module({
+  providers: [
+    // 全局拦截器
+    { provide: APP_INTERCEPTOR, useClass: ResponseTransformInterceptor },
+    
+    // 全局过滤器
+    { provide: APP_FILTER, useClass: HttpExceptionFilter },
+    
+    // 全局管道
+    { provide: APP_PIPE, useClass: ValidationPipe },
+  ],
+})
+export class AppModule {}
+```
+
+## 💡 **组件扩展指南**
+
+### **🔧 创建新的拦截器**
+
+```typescript
+@Injectable()
+export class CustomInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    // 前置处理
+    return next.handle().pipe(
+      map(data => {
+        // 后置处理
+        return data;
+      })
+    );
+  }
+}
+```
+
+### **🎨 创建新的装饰器**
+
+```typescript
+export function CustomDecorator(options?: any) {
+  return applyDecorators(
+    // 组合多个装饰器
+    ApiOperation({ summary: 'Custom operation' }),
+    ApiResponse({ status: 200, description: 'Success' }),
+  );
+}
+```
+
+### **✅ 创建新的验证器**
+
+```typescript
+@ValidatorConstraint({ name: 'customValidator', async: false })
+export class CustomValidatorConstraint implements ValidatorConstraintInterface {
+  validate(value: any, args: ValidationArguments): boolean {
+    // 验证逻辑
+    return true;
+  }
+
+  defaultMessage(args: ValidationArguments): string {
+    return 'Validation failed';
+  }
+}
+```
+
+## 🎯 **关键优势**
+
+- 🔄 **统一性**：标准化的响应格式和错误处理
+- 🛡️ **安全性**：内置XSS防护和强密码验证
+- 📊 **可观测性**：完整的请求追踪和指标收集
+- 🎨 **可扩展性**：基于继承和组合的设计模式
+- 📚 **文档化**：自动生成Swagger API文档
+- 🔧 **配置化**：支持环境变量驱动的行为配置
+
+**这套通用组件为您的NestJS应用提供了完整的基础设施支撑！** 🚀
