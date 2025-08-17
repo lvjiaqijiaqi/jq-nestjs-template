@@ -234,4 +234,37 @@ export class UserRepository extends BaseRepository<User> {
       .limit(limit)
       .getMany();
   }
+
+  /**
+   * 通过微信标识查找用户（优先使用 unionid，其次 openid）
+   */
+  async findByWeChat(providerId: string): Promise<User | null> {
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.wechatUnionId = :pid', { pid: providerId })
+      .orWhere('user.wechatOpenId = :pid', { pid: providerId })
+      .getOne();
+  }
+
+  /**
+   * 从微信资料创建用户（最小化数据集）
+   */
+  async createFromWeChat(payload: {
+    unionid?: string;
+    openid?: string;
+    nickname?: string;
+    avatar?: string;
+  }): Promise<User> {
+    const user = this.userRepository.create({
+      username: `wx_${payload.unionid || payload.openid || Date.now()}`,
+      email: `${payload.unionid || payload.openid}@wx.local`,
+      password: '',
+      nickname: payload.nickname,
+      avatar: payload.avatar,
+      wechatUnionId: payload.unionid || null,
+      wechatOpenId: payload.openid || null,
+      status: UserStatus.ACTIVE,
+    });
+    return await this.userRepository.save(user);
+  }
 }

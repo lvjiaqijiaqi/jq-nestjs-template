@@ -18,6 +18,7 @@ import { AuthSeederService } from './services/seeder.service';
 
 // 策略
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { WeChatStrategy } from './strategies/wechat.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 
 // 守卫
@@ -63,6 +64,7 @@ import { AuthController } from './controllers/auth.controller';
 
     // 策略
     JwtStrategy,
+    WeChatStrategy,
     LocalStrategy,
 
     // 守卫

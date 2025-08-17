@@ -1,0 +1,110 @@
+# App Modules Overview
+
+## GlobalConfigModule
+- **Purpose**: Global configuration management using `@nestjs/config`.
+- **Architecture**: Wraps `ConfigModule.forRoot` with:
+  - `isGlobal: true`
+  - `load: configurations` from `src/config/index.ts` (namespaces: `app`, `database`, `jwt`, `redis`, `security`, `logger`, `cache`, `queue`, `monitoring`)
+  - `validationSchema` from `validation.schema.ts`
+  - `expandVariables: true`, `cache: true`
+- **Usage**: Inject `ConfigService` anywhere. Example: `configService.get('database.host')`.
+
+## DatabaseModule
+- **Purpose**: Global TypeORM datasource bootstrap and cache integration.
+- **Architecture**: `TypeOrmModule.forRootAsync` configured from `ConfigService`.
+  - DB core: `type`, `host`, `port`, `username`, `password`, `database`
+  - Entities: `../**/*.entity{.ts,.js}`
+  - Migrations: `../../migrations/*{.ts,.js}`
+  - Behavior: `synchronize`, `logging`, `keepConnectionAlive`, `autoLoadEntities`
+  - MySQL specifics: `charset`, `timezone`
+  - Pool/extra: `extra` from `database.extra`
+  - SSL: `database.ssl`
+  - Cache: Redis-backed `{ type: 'redis', options: { host, port, password, db }, duration: 30000 }`
+  - `dataSourceFactory` for CLI/migrations
+- **Usage**: Import `TypeOrmModule.forFeature([Entity])` in feature modules for repositories. Configure `.env` via `src/config/database.config.ts`.
+
+## SecurityModule
+- **Purpose**: Global security hardening (rate limiting, security middleware, validators).
+- **Architecture**:
+  - `ThrottlerModule.forRootAsync` with values from `security.throttle` (`ttl`, `limit`)
+  - Global Guard: `ThrottlerGuard`
+  - Middleware: `SecurityMiddleware` applied to all routes
+  - Validators: `IsStrongPasswordConstraint`
+  - (Optional) Interceptor: `XssFilterInterceptor` (commented)
+- **Usage**: Configure `.env` keys mapped in `security.config.ts` (RATE_LIMIT_*, BODY_PARSER_*, helmet, ipFilter, password policy, session).
+
+## ApiDocsModule
+- **Purpose**: Global API layer behavior (response shaping, versioning, exception handling). Swagger can be added alongside.
+- **Architecture**:
+  - Interceptors: `ResponseTransformInterceptor`, `ApiVersionInterceptor`
+  - Filter: `HttpExceptionFilter`
+- **Usage**: Controllers return data; interceptor standardizes response envelope and API versioning. Errors go through `HttpExceptionFilter`.
+
+## PerformanceModule
+- **Purpose**: Caching and DB performance helpers.
+- **Architecture**:
+  - Imports `CacheModule` (project module at `src/modules/cache/cache.module`)
+  - Providers: `DatabasePerformanceService`
+  - Controller: `PerformanceController`
+- **Usage**: Inject `DatabasePerformanceService` to run perf diagnostics; use `CacheModule` for caching concerns.
+
+## QueueModule
+- **Purpose**: Background jobs/queues using Bull.
+- **Architecture**:
+  - `BullModule.forRootAsync` using `queue.redis` and `queue.global.*`
+  - Register queues: `email-queue`, `file-queue`, `notification-queue`, `data-queue`, `report-queue`
+  - Providers: `QueueService`, processors (`EmailProcessor`, `FileProcessor`)
+  - Controller: `QueueController`
+- **Usage**: Inject `QueueService` and add jobs: `queueService.addEmailJob(payload)`. Configure Redis and per-queue job options via `.env` and `queue.config.ts`.
+
+## MonitoringModule
+- **Purpose**: Health checks, metrics, and operational middlewares.
+- **Architecture**:
+  - Imports: `TerminusModule`, `QueueModule`, `CacheModule`
+  - Controllers: `MonitoringController`
+  - Providers/Exports: `HealthCheckService`, `MetricsService`
+  - Middlewares: `MetricsMiddleware`, `ActiveConnectionsMiddleware`, `ErrorRateMiddleware` applied globally
+- **Usage**: Exposes health and metrics endpoints; configure via `monitoring.config.ts` (healthCheck, metrics, apm, errorMonitoring, tracing, thresholds, alerting).
+
+## AuthModule
+- **Purpose**: Authentication/authorization with JWT + Passport.
+- **Architecture**:
+  - `PassportModule.register({ defaultStrategy: 'jwt' })`
+  - `JwtModule.registerAsync` with `jwt.*` config (secret, expiresIn, issuer, audience)
+  - Entities: `User`, `Role`, `Permission`
+  - Repos/Services: `UserRepository`, `AuthService`, `AuthSeederService`
+  - Strategies: `JwtStrategy`, `LocalStrategy`
+  - Guards: `JwtAuthGuard`, `LocalAuthGuard`, `PermissionsGuard`
+  - Controller: `AuthController`
+- **Features**:
+  - Login with account/password; register; change password; refresh tokens; get profile; logout placeholder
+  - JWT access/refresh tokens; role/permission injection into `request.user`
+  - Route-level decorators: `@Public()`, `@Auth()`, `@Roles()`, `@Permissions()`, `@CurrentUser()`, `@CurrentUserId()`
+- **Design (NestJS)**:
+  - Passport Strategy pattern (`LocalStrategy`, `JwtStrategy`)
+  - Guards for auth and authorization (`JwtAuthGuard`, `PermissionsGuard`) with `Reflector` metadata
+  - DI for `JwtService`, `ConfigService`, `UserRepository`; DTO + ValidationPipe
+  - Config-driven via `ConfigService` (`jwt.secret`, `jwt.expiresIn`, `jwt.options.*`, `jwt.refresh.*`)
+- **Typical usage**:
+  - Public routes: annotate `@Public()` (skip global JWT guard)
+  - Protected routes: `@Auth()` or controller-level guard
+  - Fine-grained authz: `@Roles('admin')`, `@Permissions('user:create')`
+  - Access user: `@CurrentUser()` or `@CurrentUserId()`
+- **Env keys (via `src/config/jwt.config.ts`)**:
+  - `JWT_SECRET`, `JWT_EXPIRES_IN`, `JWT_REFRESH_SECRET`, `JWT_REFRESH_EXPIRES_IN`
+  - Optional: `JWT_ISSUER`, `JWT_AUDIENCE`
+
+### AuthModule – WeChat OAuth/Mini Program
+- **Endpoints**:
+  - `GET /auth/wechat` → redirect to WeChat OAuth
+  - `GET /auth/wechat/callback` → OAuth callback, issues JWT and redirects to frontend
+  - `POST /auth/wechat/miniapp/login` { code } → exchanges code2Session, bind/create user, issues JWT
+- **Strategy**: `WeChatStrategy` (`passport-wechat`), name: `wechat`
+- **User binding**: fields `wechatUnionId` / `wechatOpenId`; repository helpers `findByWeChat`, `createFromWeChat`
+- **Config**: `wechat.*` (appId, secret, callbackURL, scope, webRedirect, mini.appId, mini.secret)
+- **Env**: `WECHAT_APP_ID`, `WECHAT_APP_SECRET`, `WECHAT_CALLBACK_URL`, `WECHAT_SCOPE`, `OAUTH_WEB_REDIRECT_URL`, `WECHAT_MINI_APP_ID`, `WECHAT_MINI_APP_SECRET`
+
+---
+
+# How to use in AppModule
+`

@@ -7,6 +7,7 @@ import loggerConfig from './logger.config';
 import cacheConfig from './cache.config';
 import queueConfig from './queue.config';
 import monitoringConfig from './monitoring.config';
+import wechatConfig from './wechat.config';
 
 export const configurations = [
   appConfig,
@@ -18,6 +19,7 @@ export const configurations = [
   cacheConfig,
   queueConfig,
   monitoringConfig,
+  wechatConfig,
 ];
 
 export { validationSchema } from './validation.schema';

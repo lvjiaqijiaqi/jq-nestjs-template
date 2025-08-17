@@ -6,6 +6,8 @@ import {
   Get,
   Patch,
   Logger,
+  Req,
+  Res,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthService } from '../services/auth.service';
@@ -26,13 +28,18 @@ import {
 } from '../decorators/auth.decorators';
 import { ResponseDto } from '../../../common/dto/response.dto';
 import { ApiDocumentation } from '../../../common/decorators/api-response.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('认证')
 @Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Public()
   @Post('login')
@@ -80,6 +87,58 @@ export class AuthController {
   ): Promise<ResponseDto<LoginResponseDto>> {
     const result = await this.authService.register(registerDto);
     return ResponseDto.success(result, '注册成功');
+  }
+
+  // ============ WeChat OAuth (Web/OA) ============
+  @Public()
+  @Get('wechat')
+  @UseGuards(AuthGuard('wechat'))
+  wechatLogin() {
+    // 由 passport-wechat 处理跳转
+    return;
+  }
+
+  @Public()
+  @Get('wechat/callback')
+  @UseGuards(AuthGuard('wechat'))
+  async wechatCallback(@Req() req: any, @Res() res: any) {
+    const tokens = await (this.authService as any)['generateTokens'](req.user);
+    const redirect = this.configService.get<string>('wechat.webRedirect');
+    const url = `${redirect}?token=${encodeURIComponent(tokens.accessToken)}&refresh=${encodeURIComponent(tokens.refreshToken)}`;
+    return res.redirect(url);
+  }
+
+  // ============ WeChat Mini Program ============
+  @Public()
+  @Post('wechat/miniapp/login')
+  @ApiOperation({ summary: '微信小程序登录' })
+  async wechatMiniLogin(@Body() dto: { code: string }) {
+    const appId = this.configService.get<string>('wechat.mini.appId');
+    const secret = this.configService.get<string>('wechat.mini.secret');
+    const axios = (await import('axios')).default;
+    const { data } = await axios.get(
+      'https://api.weixin.qq.com/sns/jscode2session',
+      {
+        params: {
+          appid: appId,
+          secret: secret,
+          js_code: dto.code,
+          grant_type: 'authorization_code',
+        },
+      },
+    );
+    const { openid, unionid } = data || {};
+    if (!openid && !unionid) {
+      throw new Error('Invalid code');
+    }
+    // 绑定或创建
+    const userRepo = (this.authService as any)['userRepository'];
+    let user = await userRepo.findByWeChat(unionid || openid);
+    if (!user) {
+      user = await userRepo.createFromWeChat({ unionid, openid });
+    }
+    const tokens = await (this.authService as any)['generateTokens'](user);
+    return ResponseDto.success(tokens, '登录成功');
   }
 
   @Public()

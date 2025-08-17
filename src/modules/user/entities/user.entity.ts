@@ -118,4 +118,25 @@ export class User extends BaseEntity {
     comment: '手机验证状态',
   })
   phoneVerified: boolean;
+
+  // 微信绑定（可选）
+  @ApiProperty({ description: '微信 UnionID', required: false })
+  @Column({
+    type: 'varchar',
+    length: 64,
+    unique: true,
+    nullable: true,
+    comment: '微信 UnionID',
+  })
+  wechatUnionId?: string | null;
+
+  @ApiProperty({ description: '微信 OpenID', required: false })
+  @Column({
+    type: 'varchar',
+    length: 64,
+    unique: true,
+    nullable: true,
+    comment: '微信 OpenID',
+  })
+  wechatOpenId?: string | null;
 }
